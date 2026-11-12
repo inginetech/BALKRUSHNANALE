@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -19,17 +19,11 @@
           },
           colors: {
             obsidian: '#070B14',
-            slateDeep: '#0F172A',
-            cardDark: '#111827',
-            cardElevated: '#1E293B',
-            cyanAccent: '#38BDF8',
-            indigoAccent: '#818CF8',
-            emeraldAccent: '#34D399',
-          },
-          boxShadow: {
-            'glow-cyan': '0 0 20px rgba(56, 189, 248, 0.22)',
-            'glow-indigo': '0 0 24px rgba(129, 140, 248, 0.2)',
-            'glow-emerald': '0 0 18px rgba(52, 211, 153, 0.22)',
+            panel: '#0F172A',
+            panelLight: '#162036',
+            cyanGlow: '#38BDF8',
+            indigoGlow: '#818CF8',
+            emeraldGlow: '#34D399',
           }
         }
       }
@@ -40,43 +34,58 @@
       background-color: #070B14;
       color: #F8FAFC;
       background-image:
-        radial-gradient(circle at 12% 10%, rgba(56, 189, 248, 0.09), transparent 36%),
-        radial-gradient(circle at 88% 18%, rgba(129, 140, 248, 0.1), transparent 42%),
-        radial-gradient(circle at 50% 90%, rgba(52, 211, 153, 0.05), transparent 45%),
-        linear-gradient(to right, rgba(30, 41, 59, 0.28) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(30, 41, 59, 0.28) 1px, transparent 1px);
-      background-size: 100% 100%, 100% 100%, 100% 100%, 44px 44px, 44px 44px;
+        radial-gradient(circle at 15% 10%, rgba(56, 189, 248, 0.08), transparent 38%),
+        radial-gradient(circle at 85% 20%, rgba(129, 140, 248, 0.09), transparent 42%);
     }
 
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+    /* Smooth View Page Transition */
+    .page-view {
+      display: none;
+      opacity: 0;
+      transform: translateY(10px);
     }
-    ::-webkit-scrollbar-track {
-      background: #070B14;
+    .page-view.active {
+      display: block;
+      animation: pageFadeSlide 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-    ::-webkit-scrollbar-thumb {
-      background: #1E293B;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #38BDF8;
+    @keyframes pageFadeSlide {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .glass-panel {
-      background: rgba(17, 24, 39, 0.84);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(148, 163, 184, 0.14);
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    /* Sleek Elevated Card Micro-Interactions */
+    .sleek-card {
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
-
-    .glass-panel:hover {
+    .sleek-card:hover {
       border-color: rgba(56, 189, 248, 0.32);
+      box-shadow: 0 8px 28px -8px rgba(56, 189, 248, 0.16);
+    }
+    .phase-card-hover:hover {
+      transform: translateY(-2px);
     }
 
-    .bar-glow {
-      box-shadow: 0 0 14px rgba(56, 189, 248, 0.55);
+    /* Animated Circular Ring */
+    .ring-progress {
+      transition: stroke-dashoffset 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
     }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #070B14; }
+    ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #38BDF8; }
 
     input[type="date"]::-webkit-calendar-picker-indicator {
       filter: invert(0.8);
@@ -84,832 +93,436 @@
     }
   </style>
 </head>
-<body class="min-h-screen antialiased selection:bg-sky-400/30 selection:text-sky-200">
+<body class="min-h-screen antialiased selection:bg-sky-400/25 selection:text-sky-200">
 
   <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden items-center gap-3 rounded-xl border border-sky-400/40 bg-slate-900/95 px-4 py-3 text-sm font-medium text-sky-200 shadow-glow-cyan transition-all">
-    <span class="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-    <span id="toast-msg">Progress saved.</span>
+  <div id="toast" class="fixed bottom-5 right-5 z-50 pointer-events-none flex items-center gap-2.5 rounded-xl border border-sky-400/40 bg-panel/95 px-4 py-2.5 text-xs font-semibold text-sky-200 shadow-xl opacity-0 translate-y-2 transition-all duration-300">
+    <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    <span id="toast-text">Saved</span>
   </div>
 
-  <!-- Top Navigation Header -->
-  <header class="sticky top-0 z-30 border-b border-slate-800/90 bg-obsidian/90 backdrop-blur-md">
-    <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-      <!-- Brand & Title -->
-      <div class="flex items-center gap-3.5">
-        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-sky-400/40 bg-gradient-to-br from-sky-500/20 via-indigo-500/20 to-emerald-500/20 shadow-glow-cyan">
-          <svg class="h-6 w-6 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+  <!-- Compact Top Navigation Bar -->
+  <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-obsidian/90 backdrop-blur-md">
+    <div class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl border border-sky-400/35 bg-sky-500/10 text-sky-400 shadow-sm">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </div>
         <div>
-          <div class="flex flex-wrap items-center gap-2">
-            <span class="rounded-md border border-sky-400/30 bg-sky-400/10 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-sky-300">
-              AIZEN // COMMAND CENTER
-            </span>
-            <span id="header-kpi-pill" class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 font-mono text-[11px] font-bold text-emerald-300">
-              0% DONE
-            </span>
-          </div>
-          <h1 class="mt-0.5 text-lg font-extrabold tracking-tight text-white sm:text-xl">
-            Uber-Clone Developer Command Center
-          </h1>
-          <p class="text-xs text-slate-400">
-            6-Phase Engineering Roadmap &amp; Sprint Progress Tracker
-          </p>
+          <h1 class="text-base font-extrabold tracking-tight text-white">Uber-Clone Dev Tracker</h1>
+          <p class="font-mono text-[11px] text-slate-400">6-Phase Engineering Command Center</p>
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex flex-wrap items-center gap-2">
-        <button onclick="openAddTaskModal()" class="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 px-3.5 py-2 text-xs font-semibold text-white shadow-glow-cyan transition hover:from-sky-400 hover:to-indigo-500 active:scale-95 sm:text-sm">
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          Add Task
+      <!-- Page Navigation Tabs -->
+      <nav class="flex items-center gap-1 rounded-xl border border-slate-800 bg-panel/90 p-1" aria-label="Primary Pages">
+        <button onclick="switchPage('overview')" data-nav="overview" class="nav-tab rounded-lg px-3.5 py-1.5 text-xs font-semibold transition">
+          Overview
         </button>
-
-        <button onclick="exportTextReport()" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 bg-cardElevated/90 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:border-sky-400/50 hover:text-sky-300 sm:text-sm">
-          <svg class="h-4 w-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          Export .TXT
+        <button onclick="switchPage('roadmap')" data-nav="roadmap" class="nav-tab rounded-lg px-3.5 py-1.5 text-xs font-semibold transition">
+          Roadmap
         </button>
-
-        <button onclick="exportWordReport()" class="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/35 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/20 sm:text-sm">
-          <svg class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          Export Word (.DOC)
+        <button onclick="switchPage('ops')" data-nav="ops" class="nav-tab rounded-lg px-3.5 py-1.5 text-xs font-semibold transition">
+          Tech Stack &amp; Ops
         </button>
-
-        <button onclick="openSourceModal()" class="inline-flex items-center gap-1.5 rounded-xl border border-indigo-400/35 bg-indigo-500/10 px-3 py-2 text-xs font-semibold text-indigo-300 transition hover:bg-indigo-500/20 sm:text-sm">
-          <svg class="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-          </svg>
-          Get HTML Code
+        <button onclick="switchPage('source')" data-nav="source" class="nav-tab rounded-lg px-3.5 py-1.5 text-xs font-semibold transition">
+          Source Code
         </button>
-
-        <button onclick="openResetModal()" class="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/35 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-300 transition hover:bg-rose-500/20 sm:text-sm">
-          Reset Data
-        </button>
-      </div>
+      </nav>
     </div>
   </header>
 
-  <main class="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+  <main class="mx-auto max-w-6xl px-4 py-7 sm:px-6">
 
-    <!-- Overall Progress & KPI Telemetry Card -->
-    <section class="glass-panel rounded-2xl p-5 sm:p-6 shadow-glow-indigo">
-      <div class="flex flex-col justify-between gap-4 md:flex-row md:items-end">
-        <div>
-          <span class="font-mono text-xs font-semibold uppercase tracking-widest text-sky-400">
-            Live Engineering Telemetry
-          </span>
-          <h2 class="mt-1 text-2xl font-extrabold text-white sm:text-3xl">
-            Overall Completion: <span id="overall-percent" class="font-mono text-sky-400">0%</span>
-          </h2>
-          <p id="active-phase-subtitle" class="mt-1 text-sm text-slate-400">
-            Active Focus: Phase 1 — Discovery, Architecture &amp; UI/UX Design
-          </p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-3 font-mono text-xs text-slate-400">
-          <span class="inline-flex items-center gap-1.5 rounded-lg border border-slate-700/80 bg-slateDeep/90 px-3 py-1.5">
-            <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
-            Auto-Saved Locally
-          </span>
-        </div>
-      </div>
-
-      <!-- Master Progress Bar -->
-      <div class="mt-4 h-3.5 w-full overflow-hidden rounded-full border border-slate-700/80 bg-slateDeep p-0.5">
-        <div id="overall-progress-bar" class="h-full rounded-full bg-gradient-to-r from-sky-400 via-indigo-400 to-emerald-400 bar-glow transition-all duration-500" style="width: 0%"></div>
-      </div>
-
-      <!-- KPI Cards -->
-      <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        <div class="rounded-xl border border-slate-800 bg-slateDeep/90 p-4">
-          <p class="font-mono text-xs uppercase text-slate-400">Total Tasks</p>
-          <p id="kpi-total" class="mt-1 font-mono text-2xl font-bold text-white">0</p>
-        </div>
-        <div class="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
-          <p class="font-mono text-xs uppercase text-emerald-400">Completed</p>
-          <p id="kpi-completed" class="mt-1 font-mono text-2xl font-bold text-emerald-300">0</p>
-        </div>
-        <div class="rounded-xl border border-sky-500/30 bg-sky-500/5 p-4">
-          <p class="font-mono text-xs uppercase text-sky-400">In Progress</p>
-          <p id="kpi-progress" class="mt-1 font-mono text-2xl font-bold text-sky-300">0</p>
-        </div>
-        <div class="rounded-xl border border-indigo-500/30 bg-indigo-500/5 p-4">
-          <p class="font-mono text-xs uppercase text-indigo-400">In Testing</p>
-          <p id="kpi-testing" class="mt-1 font-mono text-2xl font-bold text-indigo-300">0</p>
-        </div>
-        <div class="col-span-2 rounded-xl border border-slate-700/80 bg-slate-800/40 p-4 sm:col-span-1">
-          <p class="font-mono text-xs uppercase text-slate-400">Pending</p>
-          <p id="kpi-pending" class="mt-1 font-mono text-2xl font-bold text-slate-200">0</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Tech Stack Readiness & Weekly Developer Management Guardrails (2-Column Grid) -->
-    <section class="grid grid-cols-1 gap-6 lg:grid-cols-12">
-      <!-- Left Card: Recommended Tech Stack Readiness (7 cols) -->
-      <div class="glass-panel rounded-2xl p-5 lg:col-span-7">
-        <div class="flex flex-wrap items-center justify-between gap-2">
+    <!-- =========================================================
+         PAGE 1: OVERVIEW
+         ========================================================= -->
+    <section id="page-overview" class="page-view active space-y-6">
+      <!-- Compact Executive KPI Strip -->
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- Ring Card -->
+        <div class="sleek-card flex items-center gap-4 rounded-2xl p-5">
+          <div class="relative h-16 w-16 shrink-0">
+            <svg class="h-16 w-16" viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="26" fill="none" stroke="#1E293B" stroke-width="6" />
+              <circle id="kpi-ring" class="ring-progress" cx="32" cy="32" r="26" fill="none" stroke="#38BDF8" stroke-width="6" stroke-linecap="round" stroke-dasharray="163.36" stroke-dashoffset="163.36" />
+            </svg>
+            <span id="kpi-ring-text" class="absolute inset-0 flex items-center justify-center font-mono text-xs font-bold text-white">0%</span>
+          </div>
           <div>
-            <span class="font-mono text-[11px] font-semibold uppercase tracking-wider text-indigo-400">
-              Infrastructure Blueprint
-            </span>
-            <h3 class="text-lg font-bold text-white">Recommended Tech Stack Readiness</h3>
+            <p class="font-mono text-[11px] uppercase tracking-wider text-slate-400">Overall Progress</p>
+            <p id="kpi-ring-sub" class="mt-0.5 text-sm font-bold text-sky-400">0 of 20 Tasks</p>
           </div>
-          <span id="stack-counter-pill" class="rounded-full border border-sky-400/30 bg-sky-400/10 px-3 py-1 font-mono text-xs font-semibold text-sky-300">
-            0 / 8 Configured
-          </span>
         </div>
-        <p class="mt-1 text-xs text-slate-400">
-          Click any module below to toggle environment setup status between <span class="text-slate-300 font-semibold">Pending</span> and <span class="text-emerald-400 font-semibold">Configured</span>.
-        </p>
 
-        <div id="tech-stack-grid" class="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-          <!-- Populated dynamically -->
+        <!-- Completed Card -->
+        <div class="sleek-card flex flex-col justify-center rounded-2xl p-5">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-slate-400">Tasks Completed</p>
+          <div class="mt-1 flex items-baseline gap-2">
+            <span id="kpi-done" class="font-mono text-3xl font-extrabold text-emerald-400">0</span>
+            <span class="text-xs text-slate-400">shipped</span>
+          </div>
+        </div>
+
+        <!-- Active / Testing Card -->
+        <div class="sleek-card flex flex-col justify-center rounded-2xl p-5">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-slate-400">Active &amp; Testing</p>
+          <div class="mt-1 flex items-baseline gap-2">
+            <span id="kpi-active" class="font-mono text-3xl font-extrabold text-indigo-400">0</span>
+            <span class="text-xs text-slate-400">in sprint</span>
+          </div>
+        </div>
+
+        <!-- Target Launch Status Card -->
+        <div class="sleek-card flex flex-col justify-center rounded-2xl p-5">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-slate-400">Target Launch Status</p>
+          <p id="kpi-launch-status" class="mt-1.5 text-sm font-bold text-white">Phase 1: Discovery</p>
+          <p id="kpi-stack-badge" class="mt-0.5 font-mono text-[11px] text-emerald-400">Stack: 0/8 Ready</p>
         </div>
       </div>
 
-      <!-- Right Card: Weekly Developer Management & Bottleneck Guardrails (5 cols) -->
-      <div class="glass-panel rounded-2xl p-5 lg:col-span-5 flex flex-col justify-between">
-        <div>
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <span class="font-mono text-[11px] font-semibold uppercase tracking-wider text-emerald-400">
-                Execution Governance
-              </span>
-              <h3 class="text-lg font-bold text-white">Weekly Management &amp; Guardrails</h3>
-            </div>
-            <span id="guardrails-counter-pill" class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 font-mono text-[11px] font-semibold text-emerald-300">
-              0 / 5 Active
-            </span>
+      <!-- 6-Phase Visual Roadmap Grid -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-white">6-Phase Engineering Roadmap</h2>
+            <p class="text-xs text-slate-400">Click any phase card to open and manage its tasks directly.</p>
           </div>
-          <p class="mt-1 text-xs text-slate-400">
-            Check off sprint rituals and add custom executive notes for your leads.
-          </p>
+          <button onclick="openPhaseInRoadmap('all')" class="text-xs font-semibold text-sky-400 hover:text-sky-300">
+            View All Phases &rarr;
+          </button>
+        </div>
 
-          <div id="guardrails-list" class="mt-4 space-y-2.5">
-            <!-- Populated dynamically -->
-          </div>
+        <div id="overview-phases-grid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Quick Export & Reset Bar -->
+      <div class="sleek-card flex flex-col justify-between gap-3 rounded-2xl p-4 sm:flex-row sm:items-center">
+        <div class="flex items-center gap-2 text-xs text-slate-400">
+          <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+          <span>All updates save automatically in your browser.</span>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="exportTxtReport()" class="rounded-xl border border-slate-700 bg-panelLight px-3.5 py-2 text-xs font-semibold text-slate-200 transition hover:border-sky-400/50 hover:text-sky-300">
+            Export .TXT Report
+          </button>
+          <button onclick="exportWordReport()" class="rounded-xl border border-emerald-500/35 bg-emerald-500/10 px-3.5 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/20">
+            Export Word .DOC
+          </button>
+          <button onclick="switchPage('source')" class="rounded-xl border border-indigo-400/35 bg-indigo-500/10 px-3.5 py-2 text-xs font-semibold text-indigo-300 transition hover:bg-indigo-500/20">
+            Copy / Download Code
+          </button>
+          <button onclick="openResetModal()" class="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-300 transition hover:bg-rose-500/20">
+            Reset
+          </button>
         </div>
       </div>
     </section>
 
-    <!-- Filter & Search Bar -->
-    <section class="glass-panel rounded-2xl p-4 sm:p-5 space-y-4">
-      <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <!-- Search Input -->
-        <div class="relative flex-1">
-          <svg class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+    <!-- =========================================================
+         PAGE 2: ROADMAP (PHASE-FOCUSED)
+         ========================================================= -->
+    <section id="page-roadmap" class="page-view space-y-5">
+      <!-- Phase Selector Pills -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div id="phase-pills" class="flex flex-wrap items-center gap-1.5">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <button onclick="openAddModal()" class="inline-flex items-center gap-1.5 rounded-xl bg-sky-500 px-3.5 py-2 text-xs font-bold text-obsidian shadow-sm transition hover:bg-sky-400 active:scale-95">
+          <span>+ Add Task</span>
+        </button>
+      </div>
+
+      <!-- Compact Track Filter & Search Bar -->
+      <div class="sleek-card flex flex-col gap-3 rounded-2xl p-4 md:flex-row md:items-center md:justify-between">
+        <div id="track-pills" class="flex flex-wrap items-center gap-1.5">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <div class="relative w-full md:w-64">
           <input
             type="text"
-            id="search-input"
-            oninput="renderRoadmap()"
-            placeholder="Search by task ID, keyword (e.g., Redis, KYC, PIN, Reserve), or developer name..."
-            class="w-full rounded-xl border border-slate-700/90 bg-slateDeep/95 py-2.5 pl-10 pr-4 text-sm text-white placeholder-slate-400 focus:border-sky-400 focus:outline-none"
+            id="task-search"
+            oninput="renderRoadmapPage()"
+            placeholder="Search task or developer..."
+            class="w-full rounded-xl border border-slate-700/80 bg-obsidian/90 px-3.5 py-1.5 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
           />
-        </div>
-
-        <!-- Expand / Collapse All Phases -->
-        <div class="flex items-center gap-2 shrink-0">
-          <button onclick="setAllPhasesExpanded(true)" class="rounded-xl border border-slate-700 bg-slateDeep px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/40 hover:text-sky-300">
-            Expand All Phases
-          </button>
-          <button onclick="setAllPhasesExpanded(false)" class="rounded-xl border border-slate-700 bg-slateDeep px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/40 hover:text-sky-300">
-            Collapse All
-          </button>
         </div>
       </div>
 
-      <!-- Status Filter Pills -->
-      <div class="flex flex-col gap-2.5 pt-1 border-t border-slate-800/80">
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-400 mr-1">Status:</span>
-          <div id="status-pills" class="flex flex-wrap gap-1.5">
-            <!-- Populated dynamically -->
+      <!-- Active Phase Header Banner -->
+      <div id="phase-banner" class="sleek-card flex flex-col justify-between gap-3 rounded-2xl p-5 sm:flex-row sm:items-center">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Clean Task List -->
+      <div id="tasks-list" class="space-y-3">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- =========================================================
+         PAGE 3: TECH STACK & OPS
+         ========================================================= -->
+    <section id="page-ops" class="page-view">
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <!-- Left: Core Tech Stack Readiness -->
+        <div class="sleek-card rounded-2xl p-5 sm:p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-white">Core Tech Stack Readiness</h2>
+              <p class="text-xs text-slate-400">Click items to toggle environment setup status.</p>
+            </div>
+            <span id="ops-stack-count" class="rounded-full border border-sky-400/30 bg-sky-400/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-sky-300">
+              0 / 8
+            </span>
+          </div>
+          <div id="stack-list" class="mt-4 space-y-2.5">
+            <!-- Rendered dynamically -->
           </div>
         </div>
 
-        <!-- Track Filter Pills -->
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-400 mr-1">Track:</span>
-          <div id="track-pills" class="flex flex-wrap gap-1.5">
-            <!-- Populated dynamically -->
+        <!-- Right: Weekly Management & Bottleneck Guardrails -->
+        <div class="sleek-card rounded-2xl p-5 sm:p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-white">Weekly Management &amp; Guardrails</h2>
+              <p class="text-xs text-slate-400">Operational checkpoints to prevent sprint bottlenecks.</p>
+            </div>
+            <span id="ops-guard-count" class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-emerald-300">
+              0 / 5
+            </span>
+          </div>
+          <div id="guardrails-list" class="mt-4 space-y-2.5">
+            <!-- Rendered dynamically -->
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 6-Phase Roadmap Accordion Container -->
-    <section id="roadmap-container" class="space-y-5 pb-12">
-      <!-- Phases & Subtasks rendered dynamically -->
+    <!-- =========================================================
+         PAGE 4: SOURCE CODE & EXPORTS
+         ========================================================= -->
+    <section id="page-source" class="page-view space-y-5">
+      <div class="sleek-card rounded-2xl p-5 sm:p-6">
+        <div class="flex flex-col justify-between gap-4 border-b border-slate-800 pb-4 sm:flex-row sm:items-center">
+          <div>
+            <h2 class="text-lg font-bold text-white">Single-File Application Code &amp; Reports</h2>
+            <p class="text-xs text-slate-400">Self-contained HTML file — host anywhere or download executive progress reports.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="copyHtmlCode()" class="rounded-xl bg-sky-500 px-3.5 py-2 text-xs font-bold text-obsidian transition hover:bg-sky-400">
+              Copy HTML Code
+            </button>
+            <button onclick="downloadHtmlFile()" class="rounded-xl border border-indigo-400/40 bg-indigo-500/10 px-3.5 py-2 text-xs font-semibold text-indigo-300 transition hover:bg-indigo-500/20">
+              Download .HTML
+            </button>
+            <button onclick="exportTxtReport()" class="rounded-xl border border-slate-700 bg-panelLight px-3.5 py-2 text-xs font-semibold text-slate-200 transition hover:border-sky-400/40">
+              Export .TXT
+            </button>
+            <button onclick="exportWordReport()" class="rounded-xl border border-emerald-500/35 bg-emerald-500/10 px-3.5 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/20">
+              Export Word .DOC
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <textarea
+            id="source-viewer"
+            readonly
+            aria-label="Complete Single-File HTML Source Code"
+            class="h-96 w-full rounded-xl border border-slate-800 bg-obsidian p-4 font-mono text-xs leading-relaxed text-sky-200 focus:outline-none"
+          ></textarea>
+        </div>
+      </div>
     </section>
 
   </main>
 
-  <!-- Add Custom Task Modal -->
-  <div id="add-task-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-    <div class="w-full max-w-lg rounded-2xl border border-sky-400/35 bg-cardDark p-6 shadow-2xl">
+  <!-- Add Task Modal -->
+  <div id="add-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-md rounded-2xl border border-slate-700 bg-panel p-6 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-lg font-bold text-white">Add Custom Roadmap Task</h3>
-        <button onclick="closeModal('add-task-modal')" class="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white">
-          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        <h3 class="text-base font-bold text-white">Add New Task</h3>
+        <button onclick="closeModal('add-modal')" class="text-slate-400 hover:text-white">&times;</button>
       </div>
-
-      <form id="add-task-form" onsubmit="handleCreateTask(event)" class="mt-4 space-y-4">
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <form onsubmit="createNewTask(event)" class="mt-4 space-y-3.5">
+        <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-mono text-xs uppercase text-slate-400">Roadmap Phase</label>
-            <select id="new-task-phase" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slateDeep px-3 py-2 text-sm text-white focus:border-sky-400 focus:outline-none">
-              <option value="1">Phase 1: Discovery &amp; UI/UX</option>
-              <option value="2">Phase 2: Backend &amp; Real-Time</option>
-              <option value="3">Phase 3: MVP App Development</option>
-              <option value="4">Phase 4: Payments &amp; Safety</option>
-              <option value="5">Phase 5: Field Testing &amp; QA</option>
-              <option value="6">Phase 6: Deployment &amp; V2 Scale</option>
+            <label class="block font-mono text-[11px] uppercase text-slate-400">Phase</label>
+            <select id="in-phase" class="mt-1 w-full rounded-xl border border-slate-700 bg-obsidian px-3 py-2 text-xs text-white focus:border-sky-400 focus:outline-none">
+              <option value="1">Phase 1 (Wks 1-2)</option>
+              <option value="2">Phase 2 (Wks 3-5)</option>
+              <option value="3">Phase 3 (Wks 6-10)</option>
+              <option value="4">Phase 4 (Wks 11-13)</option>
+              <option value="5">Phase 5 (Wks 14-15)</option>
+              <option value="6">Phase 6 (Wk 16+)</option>
             </select>
           </div>
           <div>
-            <label class="block font-mono text-xs uppercase text-slate-400">Engineering Track</label>
-            <select id="new-task-track" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slateDeep px-3 py-2 text-sm text-white focus:border-sky-400 focus:outline-none">
-              <option value="Architecture & UI">Architecture &amp; UI</option>
-              <option value="Backend & Real-Time">Backend &amp; Real-Time</option>
+            <label class="block font-mono text-[11px] uppercase text-slate-400">Track</label>
+            <select id="in-track" class="mt-1 w-full rounded-xl border border-slate-700 bg-obsidian px-3 py-2 text-xs text-white focus:border-sky-400 focus:outline-none">
               <option value="Rider App">Rider App</option>
               <option value="Driver App">Driver App</option>
-              <option value="Admin Panel">Admin Panel</option>
-              <option value="Payments & Safety">Payments &amp; Safety</option>
-              <option value="QA & Launch">QA &amp; Launch</option>
+              <option value="Backend">Backend</option>
+              <option value="Admin">Admin</option>
+              <option value="QA/Ops">QA/Ops</option>
             </select>
           </div>
         </div>
-
         <div>
-          <label class="block font-mono text-xs uppercase text-slate-400">Task Title</label>
-          <input type="text" id="new-task-title" required placeholder="e.g., Implement Corporate Uber for Business Portal" class="mt-1 w-full rounded-xl border border-slate-700 bg-slateDeep px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none" />
+          <label class="block font-mono text-[11px] uppercase text-slate-400">Task Title</label>
+          <input id="in-title" type="text" required placeholder="e.g., Corporate Wallet Integration" class="mt-1 w-full rounded-xl border border-slate-700 bg-obsidian px-3 py-2 text-xs text-white focus:border-sky-400 focus:outline-none" />
         </div>
-
         <div>
-          <label class="block font-mono text-xs uppercase text-slate-400">Acceptance Criteria &amp; Technical Notes</label>
-          <textarea id="new-task-desc" rows="3" required placeholder="Specify technical requirements, API contracts, or UI deliverables..." class="mt-1 w-full rounded-xl border border-slate-700 bg-slateDeep px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"></textarea>
+          <label class="block font-mono text-[11px] uppercase text-slate-400">1-Line Deliverable Summary</label>
+          <input id="in-summary" type="text" required placeholder="Concise scope of work..." class="mt-1 w-full rounded-xl border border-slate-700 bg-obsidian px-3 py-2 text-xs text-white focus:border-sky-400 focus:outline-none" />
         </div>
-
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-mono text-xs uppercase text-slate-400">Assign Developer</label>
-            <input type="text" id="new-task-assignee" placeholder="Developer name" class="mt-1 w-full rounded-xl border border-slate-700 bg-slateDeep px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none" />
+            <label class="block font-mono text-[11px] uppercase text-slate-400">Assignee</label>
+            <input id="in-assignee" type="text" placeholder="Developer name" class="mt-1 w-full rounded-xl border border-slate-700 bg-obsidian px-3 py-2 text-xs text-white focus:border-sky-400 focus:outline-none" />
           </div>
           <div>
-            <label class="block font-mono text-xs uppercase text-slate-400">Target Due Date</label>
-            <input type="date" id="new-task-date" class="mt-1 w-full rounded-xl border border-slate-700 bg-slateDeep px-3.5 py-2 text-sm text-white focus:border-sky-400 focus:outline-none" />
+            <label class="block font-mono text-[11px] uppercase text-slate-400">Target Date</label>
+            <input id="in-date" type="date" class="mt-1 w-full rounded-xl border border-slate-700 bg-obsidian px-3 py-2 text-xs text-white focus:border-sky-400 focus:outline-none" />
           </div>
         </div>
-
-        <div class="flex justify-end gap-2.5 pt-2">
-          <button type="button" onclick="closeModal('add-task-modal')" class="rounded-xl border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800">Cancel</button>
-          <button type="submit" class="rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-glow-cyan hover:from-sky-400 hover:to-indigo-500">Create Task</button>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('add-modal')" class="rounded-xl border border-slate-700 px-3.5 py-2 text-xs text-slate-300 hover:bg-slate-800">Cancel</button>
+          <button type="submit" class="rounded-xl bg-sky-500 px-4 py-2 text-xs font-bold text-obsidian hover:bg-sky-400">Add Task</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Get HTML Code Modal -->
-  <div id="source-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-    <div class="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-2xl border border-indigo-400/40 bg-cardDark p-6 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div>
-          <h3 class="text-lg font-bold text-white">Standalone Single-File HTML Source Code</h3>
-          <p class="text-xs text-slate-400">Copy or download this self-contained file to host anywhere or share with your engineering team.</p>
-        </div>
-        <button onclick="closeModal('source-modal')" class="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white">
-          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      <div class="mt-4 flex-1 overflow-hidden">
-        <textarea id="source-code-box" readonly class="h-80 w-full rounded-xl border border-slate-700 bg-obsidian p-3 font-mono text-xs text-sky-200 focus:outline-none"></textarea>
-      </div>
-
-      <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <span class="text-xs text-slate-400">Zero external build step required.</span>
-        <div class="flex gap-2.5">
-          <button onclick="downloadHTMLFile()" class="rounded-xl border border-sky-400/40 bg-sky-400/10 px-4 py-2 text-xs font-semibold text-sky-300 hover:bg-sky-400/20">
-            Download .HTML File
-          </button>
-          <button onclick="copySourceCode()" class="rounded-xl bg-gradient-to-r from-indigo-500 to-sky-500 px-4 py-2 text-xs font-semibold text-white hover:from-indigo-400 hover:to-sky-400">
-            Copy Code to Clipboard
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Reset Confirmation Modal -->
-  <div id="reset-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-    <div class="w-full max-w-md rounded-2xl border border-rose-500/40 bg-cardDark p-6 shadow-2xl">
-      <h3 class="text-lg font-bold text-white">Reset All Command Center Data?</h3>
-      <p class="mt-2 text-sm text-slate-300">
-        This will restore all 27 default roadmap tasks, clear custom developer assignments, and reset tech stack and guardrail statuses.
+  <div id="reset-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-sm rounded-2xl border border-rose-500/35 bg-panel p-6 shadow-2xl">
+      <h3 class="text-base font-bold text-white">Reset All Progress?</h3>
+      <p class="mt-2 text-xs leading-relaxed text-slate-400">
+        This will restore default roadmap tasks, clear assignees and dates, and reset tech stack &amp; guardrail toggles.
       </p>
-      <div class="mt-5 flex justify-end gap-2.5">
-        <button onclick="closeModal('reset-modal')" class="rounded-xl border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800">Cancel</button>
-        <button onclick="confirmResetAll()" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500">Yes, Reset Data</button>
+      <div class="mt-5 flex justify-end gap-2">
+        <button onclick="closeModal('reset-modal')" class="rounded-xl border border-slate-700 px-3.5 py-2 text-xs text-slate-300 hover:bg-slate-800">Cancel</button>
+        <button onclick="confirmReset()" class="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-500">Reset Data</button>
       </div>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = 'uber_clone_command_center_dark_v2';
+    const STORAGE_KEY = 'uber_tracker_compact_spa_v1';
 
-    const STATUS_OPTIONS = ['All', 'Pending', 'In Progress', 'Testing', 'Completed'];
-    const TRACK_OPTIONS = [
-      'All Tracks',
-      'Architecture & UI',
-      'Backend & Real-Time',
-      'Rider App',
-      'Driver App',
-      'Admin Panel',
-      'Payments & Safety',
-      'QA & Launch'
+    const PHASES = [
+      { id: 1, short: 'Phase 1', title: 'Discovery & UI/UX', weeks: 'Wks 1–2', focus: 'Pricing rules, DB schemas, API contracts & Figma prototypes' },
+      { id: 2, short: 'Phase 2', title: 'Backend & Real-Time Engine', weeks: 'Wks 3–5', focus: 'OTP Auth, Redis Geo-Indexing, WebSocket GPS & Ride Matching' },
+      { id: 3, short: 'Phase 3', title: 'MVP Apps & Admin', weeks: 'Wks 6–10', focus: 'Rider App, Driver App & Web Admin Fleet Control Panel' },
+      { id: 4, short: 'Phase 4', title: 'Payments, Comms & Safety', weeks: 'Wks 11–13', focus: 'UPI/Card settlements, masked calls, 4-digit PIN & SOS' },
+      { id: 5, short: 'Phase 5', title: 'Field Testing & QA', weeks: 'Wks 14–15', focus: 'Road GPS battery testing, edge-case QA & WebSocket load tests' },
+      { id: 6, short: 'Phase 6', title: 'Launch & V2 Scaling', weeks: 'Wk 16+', focus: 'Cloud auto-scaling, 50–100 driver onboarding & V2 features' }
     ];
 
-    const PHASES_META = [
-      {
-        id: 1,
-        title: 'Phase 1: Discovery, Architecture & UI/UX Design',
-        weeks: 'Weeks 1–2',
-        goal: 'Finalize pricing rules, database schemas, API contracts, and clickable Figma user flows before writing production code.'
-      },
-      {
-        id: 2,
-        title: 'Phase 2: Backend Core & Real-Time Location Engine',
-        weeks: 'Weeks 3–5',
-        goal: 'Build the high-concurrency dispatch engine connecting riders and drivers in real time via WebSockets & Redis.'
-      },
-      {
-        id: 3,
-        title: 'Phase 3: MVP App Development – Rider, Driver & Admin',
-        weeks: 'Weeks 6–10',
-        goal: 'Deliver functional v1 interfaces across Rider mobile app, Driver mobile app, and Web Admin control panel.'
-      },
-      {
-        id: 4,
-        title: 'Phase 4: Payments, Communication & Safety Suite',
-        weeks: 'Weeks 11–13',
-        goal: 'Integrate multi-mode payments, automated commission splits, masked communication, and multi-layered rider safety.'
-      },
-      {
-        id: 5,
-        title: 'Phase 5: Field Testing & Stress QA',
-        weeks: 'Weeks 14–15',
-        goal: 'Eliminate real-world GPS drift, background battery kills, payment webhook failures, and peak load bottlenecks.'
-      },
-      {
-        id: 6,
-        title: 'Phase 6: Deployment, Driver Onboarding & V2 Scaling',
-        weeks: 'Week 16+',
-        goal: 'Deploy auto-scaling cloud infrastructure, onboard initial driver supply, and roll out high-margin V2 features.'
-      }
+    const TRACKS = ['All', 'Rider App', 'Driver App', 'Backend', 'Admin', 'QA/Ops'];
+
+    const INITIAL_TASKS = [
+      // Phase 1
+      { id: '1.1', phase: 1, track: 'Backend', title: 'Business Logic & Pricing Rules', summary: 'Define vehicle tiers, base fares, per-km/min rates, cancellation & commission %.', assignee: '', dueDate: '', status: 'Pending' },
+      { id: '1.2', phase: 1, track: 'Backend', title: 'Database & API Blueprint', summary: 'Design PostgreSQL schema (Users, Drivers, Trips, Ledger) & REST/WS contracts.', assignee: '', dueDate: '', status: 'Pending' },
+      { id: '1.3', phase: 1, track: 'Rider App', title: 'Rider, Driver & Admin Figma Prototypes', summary: 'Clickable UI flows for booking, driver dispatch alerts & admin approval queue.', assignee: '', dueDate: '', status: 'Pending' },
+
+      // Phase 2
+      { id: '2.1', phase: 2, track: 'Backend', title: 'OTP Auth & JWT Roles', summary: 'Phone OTP verification with role-based permissions for Rider, Driver & Admin.', assignee: '', dueDate: '', status: 'Pending' },
+      { id: '2.2', phase: 2, track: 'Backend', title: 'Live GPS WebSockets & Redis Geo-Indexing', summary: 'Ingest 3–5s driver GPS pings into Redis for sub-second 2–5 km radius queries.', assignee: '', dueDate: '', status: 'Pending' },
+      { id: '2.3', phase: 2, track: 'Backend', title: 'Ride-Matching & Trip State Machine', summary: 'Enforce strict trip transitions: Requested -> Accepted -> Arrived -> Active -> Done.', assignee: '', dueDate: '', status: 'Pending' },
+      { id: '2.4', phase: 2, track: 'Backend', title: 'Upfront Fare & Distance Matrix Engine', summary: 'Compute upfront trip estimates, ETAs & dynamic surge multipliers via Maps API.', assignee: '', dueDate: '', status: 'Pending' },
+
+      // Phase 3
+      { id: '3.1', phase: 3, track: 'Rider App', title: 'Rider Map, Tiers & Live Tracking', summary: 'Autocomplete pickup/drop, upfront tier fares, live vehicle markers & route polyline.', assignee: '', dueDate: '', status: 'Pending' },
+      { id: '3.2', phase: 3, track: 'Driver App', title: 'Driver KYC Upload & 15s Request Pop-up', summary: 'License/RC/ID upload, Online toggle & 15-second incoming ride accept/reject alert.', assignee: '', dueDate: '', status: 'Pending' },
+      { id: '3.3', phase: 3, track: 'Driver App', title: 'Driver Turn-by-Turn Navigation & Earnings', summary: 'In-app routing, swipeable trip status slider & daily/weekly earnings summary.', assignee: '', dueDate: '', status: 'Pending' },
+      { id: '3.4', phase: 3, track: 'Admin', title: 'Admin KYC Approval, Fleet Map & Fare Controls', summary: 'Verify driver documents, monitor live active rides & configure surge/commission rates.', assignee: '', dueDate: '', status: 'Pending' },
+
+      // Phase 4
+      { id: '4.1', phase: 4, track: 'Backend', title: 'Payment Gateway, UPI & Automated Driver Payouts', summary: 'Support UPI, cards, wallets, cash tracking & automated commission split settlements.', assignee: '', dueDate: '', status: 'Pending' },
+      { id: '4.2', phase: 4, track: 'Rider App', title: 'Masked Calling & In-App Chat', summary: 'Anonymized VoIP/number-masked calling & quick-preset chat hiding personal numbers.', assignee: '', dueDate: '', status: 'Pending' },
+      { id: '4.3', phase: 4, track: 'Rider App', title: '4-Digit Ride PIN, Live Trip Share, SOS & Ratings', summary: 'Start-trip OTP verification, trusted-contact live link, emergency SOS & 5-star reviews.', assignee: '', dueDate: '', status: 'Pending' },
+
+      // Phase 5
+      { id: '5.1', phase: 5, track: 'QA/Ops', title: 'Real-World Road & Background GPS Battery Testing', summary: 'Field drive tests in low-network zones & OS battery optimization immunity checks.', assignee: '', dueDate: '', status: 'Pending' },
+      { id: '5.2', phase: 5, track: 'QA/Ops', title: 'Mid-Trip Cancellations & Payment Edge-Case QA', summary: 'Test concurrent ride locks, failed UPI webhooks, mid-trip cancellations & surge rules.', assignee: '', dueDate: '', status: 'Pending' },
+      { id: '5.3', phase: 5, track: 'QA/Ops', title: 'WebSocket Load & Concurrency Stress Test', summary: 'Benchmark server stability under thousands of simultaneous driver GPS pings.', assignee: '', dueDate: '', status: 'Pending' },
+
+      // Phase 6
+      { id: '6.1', phase: 6, track: 'QA/Ops', title: 'Cloud Auto-Scaling & App Store/Play Store Deployment', summary: 'Deploy AWS/GCP auto-scaling backend & publish Rider and Driver apps to stores.', assignee: '', dueDate: '', status: 'Pending' },
+      { id: '6.2', phase: 6, track: 'QA/Ops', title: 'Supply-First Onboarding (50–100 Drivers)', summary: 'Verify and activate 50–100 drivers in launch zone to keep wait times under 5 mins.', assignee: '', dueDate: '', status: 'Pending' },
+      { id: '6.3', phase: 6, track: 'Rider App', title: 'V2 Features (Scheduled Rides, Multi-Stop, Heatmaps, Courier)', summary: 'Roll out Reserve scheduling, multi-stop trips, driver surge heatmaps & parcel delivery.', assignee: '', dueDate: '', status: 'Pending' }
     ];
 
-    const DEFAULT_TECH_STACK = [
-      {
-        id: 'ts-1',
-        num: '01',
-        category: 'Rider & Driver Mobile Apps',
-        stack: 'Flutter (Android & iOS)',
-        desc: 'Single cross-platform codebase for smooth 60fps real-time map animations.',
-        configured: false
-      },
-      {
-        id: 'ts-2',
-        num: '02',
-        category: 'Backend & Real-Time Engine',
-        stack: 'Node.js / Go + WebSockets / Socket.io',
-        desc: 'Bidirectional low-latency streaming for 3–5s GPS pings and trip events.',
-        configured: false
-      },
-      {
-        id: 'ts-3',
-        num: '03',
-        category: 'Geospatial Database',
-        stack: 'PostgreSQL + PostGIS',
-        desc: 'ACID-compliant trip ledger, user profiles, and polygon geofencing.',
-        configured: false
-      },
-      {
-        id: 'ts-4',
-        num: '04',
-        category: 'Real-Time Driver Cache',
-        stack: 'Redis Geo-Indexing',
-        desc: 'Sub-millisecond spatial radius queries for active nearby drivers.',
-        configured: false
-      },
-      {
-        id: 'ts-5',
-        num: '05',
-        category: 'Admin Web Panel',
-        stack: 'React.js / Next.js + Tailwind CSS',
-        desc: 'Operations command dashboard for KYC approvals, live fleet map & pricing.',
-        configured: false
-      },
-      {
-        id: 'ts-6',
-        num: '06',
-        category: 'Maps & Routing',
-        stack: 'Google Maps SDK / Mapbox + Distance Matrix',
-        desc: 'Places autocomplete, turn-by-turn polylines, and upfront ETA/fare calculation.',
-        configured: false
-      },
-      {
-        id: 'ts-7',
-        num: '07',
-        category: 'Messaging & OTP',
-        stack: 'Firebase Cloud Messaging + Twilio / MSG91',
-        desc: 'Instant push alerts, SMS OTP authentication, and number-masked VoIP calls.',
-        configured: false
-      },
-      {
-        id: 'ts-8',
-        num: '08',
-        category: 'Payments & Payouts',
-        stack: 'Razorpay / Stripe UPI, Cards & Settlements',
-        desc: 'Multi-mode fare collection, wallet top-ups, and automated driver splits.',
-        configured: false
-      }
+    const INITIAL_STACK = [
+      { id: 'st-1', name: 'Flutter Mobile Apps', detail: 'Single Android & iOS codebase for Rider & Driver', ready: false },
+      { id: 'st-2', name: 'Node.js / Go + WebSockets', detail: 'Real-time Socket.io event & GPS stream server', ready: false },
+      { id: 'st-3', name: 'PostgreSQL + PostGIS', detail: 'Relational trip ledger & spatial geofencing', ready: false },
+      { id: 'st-4', name: 'Redis Geo-Cache', detail: 'In-memory millisecond nearby-driver indexing', ready: false },
+      { id: 'st-5', name: 'React / Next.js Admin', detail: 'Web operations portal for KYC & live fleet map', ready: false },
+      { id: 'st-6', name: 'Google Maps SDK', detail: 'Places autocomplete, routing & Distance Matrix', ready: false },
+      { id: 'st-7', name: 'Firebase & Twilio / MSG91', detail: 'FCM push alerts, SMS OTP & masked VoIP calls', ready: false },
+      { id: 'st-8', name: 'Razorpay / Stripe', detail: 'UPI, cards, wallets & automated driver splits', ready: false }
     ];
 
-    const DEFAULT_GUARDRAILS = [
-      {
-        id: 'gr-1',
-        title: 'Kanban Board Sync',
-        desc: 'Break every phase task into 1–2 day granular tickets (To Do -> In Progress -> Testing -> Done).',
-        note: '',
-        checked: false
-      },
-      {
-        id: 'gr-2',
-        title: 'Friday Live Sprint Demo',
-        desc: 'Require an end-to-end Rider phone to Driver phone live booking test on staging every Friday.',
-        note: '',
-        checked: false
-      },
-      {
-        id: 'gr-3',
-        title: 'Bottleneck Watch #1: Google Maps API Billing & Caching Audit',
-        desc: 'Audit Distance Matrix & Places Autocomplete request frequency and cache frequent routes.',
-        note: '',
-        checked: false
-      },
-      {
-        id: 'gr-4',
-        title: 'Bottleneck Watch #2: Driver App Background GPS & Battery Check',
-        desc: 'Verify Android/iOS OS battery optimization does not kill background WebSocket location pings.',
-        note: '',
-        checked: false
-      },
-      {
-        id: 'gr-5',
-        title: 'Supply-First Launch Readiness',
-        desc: 'Onboard and verify 50–100 active drivers in the launch zone before opening rider signups.',
-        note: '',
-        checked: false
-      }
+    const INITIAL_GUARDRAILS = [
+      { id: 'gd-1', title: 'Kanban 1–2 Day Tickets', detail: 'Keep every developer ticket scoped to 1–2 days max.', active: false },
+      { id: 'gd-2', title: 'Friday Live Staging Booking Demo', detail: 'Run live Rider-to-Driver test ride every Friday.', active: false },
+      { id: 'gd-3', title: 'Google Maps API Billing Cap Alert', detail: 'Enable billing alerts & cache frequent route estimates.', active: false },
+      { id: 'gd-4', title: 'Driver Background GPS Battery Check', detail: 'Ensure background location service survives OS sleep.', active: false },
+      { id: 'gd-5', title: 'Pre-Launch Zone Liquidity Check', detail: 'Confirm 50+ active drivers online before rider promo.', active: false }
     ];
 
-    const DEFAULT_TASKS = [
-      // Phase 1 (4 tasks)
-      {
-        id: '1.1',
-        phase: 1,
-        track: 'Architecture & UI',
-        title: 'Business Logic & Pricing Rules',
-        desc: 'Define vehicle tiers (Bike, Auto, Mini, Sedan), base fare, per-km/min rates, cancellation fees, and platform commission %.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '1.2',
-        phase: 1,
-        track: 'Backend & Real-Time',
-        title: 'Database & API Blueprint',
-        desc: 'Design schema for Users, Drivers, Vehicles, Trips, Transactions, Ratings + REST & WebSocket API contracts.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '1.3',
-        phase: 1,
-        track: 'Architecture & UI',
-        title: 'Rider App UI/UX Prototypes in Figma',
-        desc: 'Clickable flows: Login -> Map Home -> Pickup/Drop -> Tier & Fare Estimate -> Live Tracking -> Payment & Rating.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '1.4',
-        phase: 1,
-        track: 'Architecture & UI',
-        title: 'Driver App & Admin UI/UX Prototypes in Figma',
-        desc: 'Driver KYC -> Online Toggle -> Ride Alert -> Navigation -> Earnings; Admin Approval Queue & Fleet Map.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-
-      // Phase 2 (4 tasks)
-      {
-        id: '2.1',
-        phase: 2,
-        track: 'Backend & Real-Time',
-        title: 'Authentication & Role Management',
-        desc: 'Phone OTP verification, JWT tokens, and separate role permissions for Riders, Drivers, and Admins.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '2.2',
-        phase: 2,
-        track: 'Backend & Real-Time',
-        title: 'Live GPS Streaming & Redis Geo-Indexing',
-        desc: 'WebSocket channels pinging driver coordinates every 3–5s into Redis for 2–5 km radius lookup.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '2.3',
-        phase: 2,
-        track: 'Backend & Real-Time',
-        title: 'Ride-Matching & Trip State Machine',
-        desc: 'Dispatch algorithm + strict state transitions: REQUESTED -> ACCEPTED -> ARRIVED -> IN_PROGRESS -> COMPLETED/CANCELLED.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '2.4',
-        phase: 2,
-        track: 'Backend & Real-Time',
-        title: 'Upfront Fare Calculation Engine',
-        desc: 'Google Maps Distance Matrix API integration for distance/duration estimates and dynamic surge multipliers.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-
-      // Phase 3 (6 tasks)
-      {
-        id: '3.1',
-        phase: 3,
-        track: 'Rider App',
-        title: 'Rider App: Map, Autocomplete & Ride Tier Selector',
-        desc: 'Live nearby vehicle markers, address autocomplete, and upfront fare comparison across vehicle tiers.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '3.2',
-        phase: 3,
-        track: 'Rider App',
-        title: 'Rider App: Live Tracking & Push Notifications',
-        desc: 'Driver approach animation, live ETA updates, route polyline rendering, and FCM push alerts.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '3.3',
-        phase: 3,
-        track: 'Driver App',
-        title: 'Driver App: KYC Upload & Online/Offline Dispatch Toggle',
-        desc: 'License, RC, Insurance document upload; online switch and 15-second incoming ride accept/reject popup.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '3.4',
-        phase: 3,
-        track: 'Driver App',
-        title: 'Driver App: Turn-by-Turn Navigation & Trip Status Slider',
-        desc: 'In-app GPS routing + swipeable Arrived -> Start Trip -> End Trip slider + daily earnings summary view.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '3.5',
-        phase: 3,
-        track: 'Admin Panel',
-        title: 'Admin Panel: Driver KYC Verification & Live Fleet Map',
-        desc: 'Web portal to approve/reject driver documents and monitor active drivers & ongoing trips in real time.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '3.6',
-        phase: 3,
-        track: 'Admin Panel',
-        title: 'Admin Panel: Master Fare & Commission Controls',
-        desc: 'Dynamic configuration dashboard for base fares, per-km rates, surge rules, and platform commission %.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-
-      // Phase 4 (4 tasks)
-      {
-        id: '4.1',
-        phase: 4,
-        track: 'Payments & Safety',
-        title: 'Payment Gateway, Wallet & Split Settlements',
-        desc: 'UPI, cards, wallets, cash tracking, automated platform commission split, and instant/scheduled driver payouts.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '4.2',
-        phase: 4,
-        track: 'Payments & Safety',
-        title: 'Masked In-App Communication',
-        desc: 'In-app chat with quick presets + VoIP/number-masked calling hiding personal phone numbers.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '4.3',
-        phase: 4,
-        track: 'Payments & Safety',
-        title: 'Safety Suite: 4-Digit Start PIN & Live Trip Share',
-        desc: '4-digit OTP verification before trip start + shareable live tracking URL for up to 5 trusted contacts.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '4.4',
-        phase: 4,
-        track: 'Payments & Safety',
-        title: 'Safety Suite: SOS Button, RideCheck & 2-Way Ratings',
-        desc: 'Emergency SOS trigger, unexpected long-stop/route-deviation detection, and 5-star rating & review system.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-
-      // Phase 5 (3 tasks)
-      {
-        id: '5.1',
-        phase: 5,
-        track: 'QA & Launch',
-        title: 'Real-World Road & Background GPS Testing',
-        desc: 'Physical drive tests in low-network zones, battery optimization immunity checks, and route recalculations.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '5.2',
-        phase: 5,
-        track: 'QA & Launch',
-        title: 'Edge-Case & Payment Failure QA',
-        desc: 'Simulate mid-trip cancellations, failed UPI/card webhooks, concurrent ride locks, and surge pricing triggers.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '5.3',
-        phase: 5,
-        track: 'QA & Launch',
-        title: 'WebSocket & Server Load Testing',
-        desc: 'Stress-test concurrent driver GPS pings and Redis geospatial matching latency under peak traffic.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-
-      // Phase 6 (5 tasks)
-      {
-        id: '6.1',
-        phase: 6,
-        track: 'QA & Launch',
-        title: 'Cloud Auto-Scaling & App Store Deployment',
-        desc: 'Deploy backend on AWS/GCP with auto-scaling; publish Rider & Driver apps to Google Play & Apple App Store.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '6.2',
-        phase: 6,
-        track: 'QA & Launch',
-        title: 'Supply-First Driver Onboarding Drive',
-        desc: 'Verify and onboard 50–100 active drivers in dense launch zone to keep rider wait times under 5 minutes.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '6.3',
-        phase: 6,
-        track: 'Rider App',
-        title: 'Post-Launch V2: Scheduled Rides (Reserve) & Multi-Stop Trips',
-        desc: 'Advance ride scheduling up to 90 days ahead + mid-trip extra drop-off/pickup points.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '6.4',
-        phase: 6,
-        track: 'Driver App',
-        title: 'Post-Launch V2: Driver Surge Heatmaps & Destination Filter',
-        desc: 'High-demand earnings multiplier map overlays + homeward directional ride filtering.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      },
-      {
-        id: '6.5',
-        phase: 6,
-        track: 'Rider App',
-        title: 'Post-Launch V2: Promo/Referral Engine & Package Delivery',
-        desc: 'Coupon codes, user referral rewards, and Uber Connect same-day parcel courier tier.',
-        assignee: '',
-        dueDate: '',
-        status: 'Pending'
-      }
-    ];
-
-    let activeStatusFilter = 'All';
-    let activeTrackFilter = 'All Tracks';
-    let appState = loadState();
+    let currentPage = 'overview';
+    let selectedPhase = 1; // 1..6 or 'all'
+    let selectedTrack = 'All';
+    let state = loadState();
 
     function loadState() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed && Array.isArray(parsed.tasks)) {
-            return parsed;
-          }
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && Array.isArray(parsed.tasks)) return parsed;
         }
-      } catch (e) {
-        console.error('Error loading saved state:', e);
-      }
+      } catch (e) { /* fallback */ }
       return {
-        tasks: JSON.parse(JSON.stringify(DEFAULT_TASKS)),
-        techStack: JSON.parse(JSON.stringify(DEFAULT_TECH_STACK)),
-        guardrails: JSON.parse(JSON.stringify(DEFAULT_GUARDRAILS)),
-        expandedPhases: { 1: true, 2: true, 3: true, 4: true, 5: true, 6: true }
+        tasks: JSON.parse(JSON.stringify(INITIAL_TASKS)),
+        stack: JSON.parse(JSON.stringify(INITIAL_STACK)),
+        guardrails: JSON.parse(JSON.stringify(INITIAL_GUARDRAILS))
       };
     }
 
     function saveState(toastMsg) {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         if (toastMsg) showToast(toastMsg);
-      } catch (e) {
-        console.error('Error saving state:', e);
-      }
+      } catch (e) { /* ignore */ }
     }
 
     function showToast(msg) {
-      const toast = document.getElementById('toast');
-      document.getElementById('toast-msg').textContent = msg;
-      toast.classList.remove('hidden');
-      toast.classList.add('flex');
+      const el = document.getElementById('toast');
+      document.getElementById('toast-text').textContent = msg;
+      el.classList.remove('opacity-0', 'translate-y-2');
+      el.classList.add('opacity-100', 'translate-y-0');
       clearTimeout(window._toastTimer);
       window._toastTimer = setTimeout(() => {
-        toast.classList.add('hidden');
-        toast.classList.remove('flex');
-      }, 2500);
+        el.classList.add('opacity-0', 'translate-y-2');
+        el.classList.remove('opacity-100', 'translate-y-0');
+      }, 2200);
     }
 
-    function escapeHtml(str) {
+    function esc(str) {
       return String(str || '')
         .replace(/&/g, '&amp;')
         .replace(/"/g, '&quot;')
@@ -917,411 +530,510 @@
         .replace(/>/g, '&gt;');
     }
 
-    function getTrackBadgeStyle(track) {
-      switch (track) {
-        case 'Architecture & UI': return 'border-sky-400/40 bg-sky-400/10 text-sky-300';
-        case 'Backend & Real-Time': return 'border-indigo-400/40 bg-indigo-400/10 text-indigo-300';
-        case 'Rider App': return 'border-cyan-400/40 bg-cyan-400/10 text-cyan-300';
-        case 'Driver App': return 'border-emerald-400/40 bg-emerald-400/10 text-emerald-300';
-        case 'Admin Panel': return 'border-purple-400/40 bg-purple-400/10 text-purple-300';
-        case 'Payments & Safety': return 'border-amber-400/40 bg-amber-400/10 text-amber-300';
-        case 'QA & Launch': return 'border-rose-400/40 bg-rose-400/10 text-rose-300';
-        default: return 'border-slate-600 bg-slate-800 text-slate-300';
+    // Page Switching with Smooth Animation
+    function switchPage(pageId) {
+      currentPage = pageId;
+      document.querySelectorAll('.page-view').forEach(sec => {
+        sec.classList.remove('active');
+      });
+      const target = document.getElementById(`page-${pageId}`);
+      if (target) {
+        void target.offsetWidth; // trigger reflow for clean animation replay
+        target.classList.add('active');
       }
+
+      document.querySelectorAll('.nav-tab').forEach(btn => {
+        const isActive = btn.dataset.nav === pageId;
+        btn.className = isActive
+          ? 'nav-tab rounded-lg bg-sky-500/15 text-sky-300 border border-sky-400/35 px-3.5 py-1.5 text-xs font-bold transition'
+          : 'nav-tab rounded-lg text-slate-400 hover:text-white border border-transparent px-3.5 py-1.5 text-xs font-semibold transition';
+      });
+
+      if (pageId === 'overview') renderOverviewPage();
+      if (pageId === 'roadmap') renderRoadmapPage();
+      if (pageId === 'ops') renderOpsPage();
+      if (pageId === 'source') renderSourcePage();
     }
 
-    function getStatusSelectStyle(status) {
-      switch (status) {
-        case 'Completed': return 'border-emerald-400/50 bg-emerald-500/15 text-emerald-300';
-        case 'In Progress': return 'border-sky-400/50 bg-sky-500/15 text-sky-300';
-        case 'Testing': return 'border-indigo-400/50 bg-indigo-500/15 text-indigo-300';
-        default: return 'border-slate-700 bg-slateDeep text-slate-300';
-      }
+    function openPhaseInRoadmap(phaseVal) {
+      selectedPhase = phaseVal;
+      switchPage('roadmap');
     }
 
-    // Render Tech Stack Readiness
-    function renderTechStack() {
-      const container = document.getElementById('tech-stack-grid');
-      const readyCount = appState.techStack.filter(s => s.configured).length;
-      document.getElementById('stack-counter-pill').textContent = `${readyCount} / ${appState.techStack.length} Configured`;
+    // ==========================================
+    // RENDER PAGE 1: OVERVIEW
+    // ==========================================
+    function renderOverviewPage() {
+      const total = state.tasks.length;
+      const done = state.tasks.filter(t => t.status === 'Completed').length;
+      const active = state.tasks.filter(t => t.status === 'In Progress' || t.status === 'Testing').length;
+      const pct = total === 0 ? 0 : Math.round((done / total) * 100);
 
-      container.innerHTML = appState.techStack.map(item => `
-        <button
-          onclick="toggleTechStack('${item.id}')"
-          class="flex items-start justify-between gap-2.5 rounded-xl border p-3 text-left transition ${
-            item.configured
-              ? 'border-emerald-400/45 bg-emerald-950/25 shadow-glow-emerald'
-              : 'border-slate-800 bg-slateDeep/85 hover:border-sky-400/40'
-          }"
-        >
-          <div class="min-w-0">
-            <div class="flex items-center gap-1.5">
-              <span class="font-mono text-[10px] font-bold ${item.configured ? 'text-emerald-400' : 'text-sky-400'}">${item.num}</span>
-              <span class="truncate font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">${item.category}</span>
-            </div>
-            <p class="mt-0.5 text-xs font-bold text-white sm:text-sm">${item.stack}</p>
-            <p class="mt-0.5 text-[11px] leading-snug text-slate-400">${item.desc}</p>
-          </div>
-          <span class="shrink-0 rounded-md border px-2 py-0.5 font-mono text-[10px] font-bold ${
-            item.configured
-              ? 'border-emerald-400/50 bg-emerald-400/20 text-emerald-300'
-              : 'border-slate-700 bg-slate-800 text-slate-400'
-          }">
-            ${item.configured ? 'CONFIGURED' : 'PENDING'}
-          </span>
-        </button>
-      `).join('');
-    }
+      // Update Circular SVG Ring (circumference = 2 * pi * 26 = 163.36)
+      const circumference = 163.36;
+      const offset = circumference - (pct / 100) * circumference;
+      document.getElementById('kpi-ring').style.strokeDashoffset = offset;
+      document.getElementById('kpi-ring-text').textContent = `${pct}%`;
+      document.getElementById('kpi-ring-sub').textContent = `${done} of ${total} Tasks`;
 
-    function toggleTechStack(id) {
-      const item = appState.techStack.find(s => s.id === id);
-      if (item) {
-        item.configured = !item.configured;
-        saveState(`${item.stack} -> ${item.configured ? 'Configured' : 'Pending'}`);
-        renderTechStack();
-      }
-    }
+      document.getElementById('kpi-done').textContent = done;
+      document.getElementById('kpi-active').textContent = active;
 
-    // Render Weekly Management Guardrails
-    function renderGuardrails() {
-      const container = document.getElementById('guardrails-list');
-      const checkedCount = appState.guardrails.filter(g => g.checked).length;
-      document.getElementById('guardrails-counter-pill').textContent = `${checkedCount} / ${appState.guardrails.length} Active`;
-
-      container.innerHTML = appState.guardrails.map(item => `
-        <div class="rounded-xl border p-3 transition ${
-          item.checked
-            ? 'border-emerald-400/35 bg-emerald-950/15'
-            : 'border-slate-800 bg-slateDeep/85 hover:border-slate-700'
-        }">
-          <label class="flex cursor-pointer items-start gap-2.5">
-            <input
-              type="checkbox"
-              ${item.checked ? 'checked' : ''}
-              onchange="toggleGuardrail('${item.id}')"
-              class="mt-0.5 h-4 w-4 rounded border-slate-600 bg-slate-800 text-emerald-400 focus:ring-emerald-400"
-            />
-            <div class="flex-1">
-              <p class="text-xs font-bold ${item.checked ? 'text-emerald-300' : 'text-white'} sm:text-sm">
-                ${item.title}
-              </p>
-              <p class="mt-0.5 text-[11px] text-slate-400">${item.desc}</p>
-            </div>
-          </label>
-          <input
-            type="text"
-            value="${escapeHtml(item.note || '')}"
-            onchange="updateGuardrailNote('${item.id}', this.value)"
-            placeholder="Add lead note or audit date..."
-            class="mt-2 w-full rounded-lg border border-slate-800 bg-obsidian/80 px-2.5 py-1 text-[11px] text-sky-200 placeholder-slate-500 focus:border-sky-400 focus:outline-none"
-          />
-        </div>
-      `).join('');
-    }
-
-    function toggleGuardrail(id) {
-      const item = appState.guardrails.find(g => g.id === id);
-      if (item) {
-        item.checked = !item.checked;
-        saveState('Management guardrail updated.');
-        renderGuardrails();
-      }
-    }
-
-    function updateGuardrailNote(id, val) {
-      const item = appState.guardrails.find(g => g.id === id);
-      if (item) {
-        item.note = val;
-        saveState('Guardrail note saved.');
-      }
-    }
-
-    // Render Filter Pills
-    function renderFilterPills() {
-      const statusContainer = document.getElementById('status-pills');
-      statusContainer.innerHTML = STATUS_OPTIONS.map(status => {
-        const active = activeStatusFilter === status;
-        return `
-          <button
-            onclick="setStatusFilter('${status}')"
-            class="rounded-full border px-3 py-1 text-xs font-semibold transition ${
-              active
-                ? 'border-sky-400 bg-sky-400/20 text-sky-200 shadow-glow-cyan'
-                : 'border-slate-700/80 bg-slateDeep text-slate-400 hover:border-slate-500 hover:text-slate-200'
-            }"
-          >
-            ${status}
-          </button>
-        `;
-      }).join('');
-
-      const trackContainer = document.getElementById('track-pills');
-      trackContainer.innerHTML = TRACK_OPTIONS.map(track => {
-        const active = activeTrackFilter === track;
-        return `
-          <button
-            onclick="setTrackFilter('${track}')"
-            class="rounded-full border px-3 py-1 text-xs font-semibold transition ${
-              active
-                ? 'border-indigo-400 bg-indigo-500/20 text-indigo-200 shadow-glow-indigo'
-                : 'border-slate-700/80 bg-slateDeep text-slate-400 hover:border-slate-500 hover:text-slate-200'
-            }"
-          >
-            ${track}
-          </button>
-        `;
-      }).join('');
-    }
-
-    function setStatusFilter(status) {
-      activeStatusFilter = status;
-      renderFilterPills();
-      renderRoadmap();
-    }
-
-    function setTrackFilter(track) {
-      activeTrackFilter = track;
-      renderFilterPills();
-      renderRoadmap();
-    }
-
-    // Telemetry Update
-    function updateKPIs() {
-      const total = appState.tasks.length;
-      const completed = appState.tasks.filter(t => t.status === 'Completed').length;
-      const inProgress = appState.tasks.filter(t => t.status === 'In Progress').length;
-      const testing = appState.tasks.filter(t => t.status === 'Testing').length;
-      const pending = appState.tasks.filter(t => t.status === 'Pending').length;
-      const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
-
-      document.getElementById('overall-percent').textContent = `${pct}%`;
-      document.getElementById('header-kpi-pill').textContent = `${pct}% DONE (${completed}/${total})`;
-      document.getElementById('overall-progress-bar').style.width = `${pct}%`;
-
-      document.getElementById('kpi-total').textContent = total;
-      document.getElementById('kpi-completed').textContent = completed;
-      document.getElementById('kpi-progress').textContent = inProgress;
-      document.getElementById('kpi-testing').textContent = testing;
-      document.getElementById('kpi-pending').textContent = pending;
-
-      let activePhase = PHASES_META[PHASES_META.length - 1];
-      for (const p of PHASES_META) {
-        const pTasks = appState.tasks.filter(t => t.phase === p.id);
+      // Active Phase Status
+      let activePhase = PHASES[PHASES.length - 1];
+      for (const p of PHASES) {
+        const pTasks = state.tasks.filter(t => t.phase === p.id);
         if (pTasks.some(t => t.status !== 'Completed')) {
           activePhase = p;
           break;
         }
       }
-      document.getElementById('active-phase-subtitle').textContent =
-        pct === 100
-          ? 'All 6 Engineering Phases Completed — Ready for Full Scale!'
-          : `Active Focus: ${activePhase.title} (${activePhase.weeks})`;
-    }
+      document.getElementById('kpi-launch-status').textContent =
+        pct === 100 ? 'Ready for Full Launch!' : `${activePhase.short}: ${activePhase.title}`;
 
-    function togglePhaseExpand(phaseId) {
-      if (!appState.expandedPhases) appState.expandedPhases = {};
-      appState.expandedPhases[phaseId] = !(appState.expandedPhases[phaseId] !== false);
-      saveState();
-      renderRoadmap();
-    }
+      const stackReady = state.stack.filter(s => s.ready).length;
+      document.getElementById('kpi-stack-badge').textContent = `Stack: ${stackReady}/${state.stack.length} Ready`;
 
-    function setAllPhasesExpanded(state) {
-      appState.expandedPhases = { 1: state, 2: state, 3: state, 4: state, 5: state, 6: state };
-      saveState();
-      renderRoadmap();
-    }
+      // Render 6-Phase Cards Grid
+      const grid = document.getElementById('overview-phases-grid');
+      grid.innerHTML = PHASES.map(p => {
+        const pTasks = state.tasks.filter(t => t.phase === p.id);
+        const pDone = pTasks.filter(t => t.status === 'Completed').length;
+        const pPct = pTasks.length === 0 ? 0 : Math.round((pDone / pTasks.length) * 100);
+        const isComplete = pPct === 100 && pTasks.length > 0;
 
-    // Render 6-Phase Roadmap
-    function renderRoadmap() {
-      updateKPIs();
-      const container = document.getElementById('roadmap-container');
-      const query = document.getElementById('search-input').value.trim().toLowerCase();
+        return `
+          <div onclick="openPhaseInRoadmap(${p.id})" class="sleek-card phase-card-hover cursor-pointer rounded-2xl p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="rounded-md border border-sky-400/30 bg-sky-400/10 px-2 py-0.5 font-mono text-[11px] font-bold text-sky-300">
+                  ${p.short} • ${p.weeks}
+                </span>
+                <span class="font-mono text-xs font-bold ${isComplete ? 'text-emerald-400' : 'text-slate-300'}">
+                  ${pDone}/${pTasks.length}
+                </span>
+              </div>
+              <h3 class="mt-2.5 text-sm font-bold text-white">${p.title}</h3>
+              <p class="mt-1 text-xs leading-relaxed text-slate-400">${p.focus}</p>
+            </div>
 
-      let html = '';
-
-      PHASES_META.forEach(phase => {
-        const allPhaseTasks = appState.tasks.filter(t => t.phase === phase.id);
-        const completedCount = allPhaseTasks.filter(t => t.status === 'Completed').length;
-        const phasePct = allPhaseTasks.length === 0 ? 0 : Math.round((completedCount / allPhaseTasks.length) * 100);
-        const isExpanded = !appState.expandedPhases || appState.expandedPhases[phase.id] !== false;
-
-        const filteredTasks = allPhaseTasks.filter(task => {
-          const matchesStatus = activeStatusFilter === 'All' || task.status === activeStatusFilter;
-          const matchesTrack = activeTrackFilter === 'All Tracks' || task.track === activeTrackFilter;
-          const matchesSearch =
-            !query ||
-            task.id.toLowerCase().includes(query) ||
-            task.title.toLowerCase().includes(query) ||
-            task.desc.toLowerCase().includes(query) ||
-            (task.assignee && task.assignee.toLowerCase().includes(query));
-          return matchesStatus && matchesTrack && matchesSearch;
-        });
-
-        if (filteredTasks.length === 0 && (query || activeStatusFilter !== 'All' || activeTrackFilter !== 'All Tracks')) {
-          return;
-        }
-
-        html += `
-          <div class="glass-panel overflow-hidden rounded-2xl">
-            <!-- Phase Header (Clickable Accordion) -->
-            <div
-              onclick="togglePhaseExpand(${phase.id})"
-              class="cursor-pointer border-b border-slate-800/90 bg-slateDeep/80 p-5 transition hover:bg-slate-900/90"
-            >
-              <div class="flex flex-col justify-between gap-3 md:flex-row md:items-center">
-                <div class="flex items-start gap-3">
-                  <button
-                    type="button"
-                    aria-label="Toggle phase section"
-                    class="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-slate-700 bg-cardDark text-sky-400 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}"
-                  >
-                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                  <div>
-                    <div class="flex flex-wrap items-center gap-2">
-                      <span class="rounded-lg border border-sky-400/35 bg-sky-400/10 px-2.5 py-0.5 font-mono text-xs font-bold text-sky-300">
-                        ${phase.weeks}
-                      </span>
-                      <h3 class="text-base font-extrabold text-white sm:text-lg">${phase.title}</h3>
-                    </div>
-                    <p class="mt-1 text-xs text-slate-400 sm:text-sm">${phase.goal}</p>
-                  </div>
-                </div>
-
-                <!-- Phase Progress Pill & Bar -->
-                <div class="flex items-center gap-3 self-start pl-9 md:self-center md:pl-0">
-                  <div class="text-right">
-                    <span class="font-mono text-xs text-slate-400">${completedCount}/${allPhaseTasks.length} Tasks</span>
-                    <p class="font-mono text-sm font-bold ${phasePct === 100 ? 'text-emerald-400' : 'text-sky-400'}">${phasePct}%</p>
-                  </div>
-                  <div class="h-2.5 w-28 overflow-hidden rounded-full border border-slate-700/80 bg-obsidian">
-                    <div class="h-full rounded-full ${phasePct === 100 ? 'bg-emerald-400' : 'bg-gradient-to-r from-sky-400 to-indigo-400'} transition-all duration-300" style="width: ${phasePct}%"></div>
-                  </div>
-                </div>
+            <div class="mt-4">
+              <div class="flex items-center justify-between font-mono text-[11px] mb-1.5">
+                <span class="text-slate-400">Progress</span>
+                <span class="${isComplete ? 'text-emerald-400' : 'text-sky-400'} font-bold">${pPct}%</span>
+              </div>
+              <div class="h-1.5 w-full overflow-hidden rounded-full bg-obsidian">
+                <div class="h-full rounded-full transition-all duration-500 ${isComplete ? 'bg-emerald-400' : 'bg-gradient-to-r from-sky-400 to-indigo-400'}" style="width: ${pPct}%"></div>
               </div>
             </div>
+          </div>
+        `;
+      }).join('');
+    }
 
-            <!-- Phase Subtasks -->
-            <div class="${isExpanded ? 'divide-y divide-slate-800/75' : 'hidden'}">
-              ${filteredTasks.map(task => `
-                <div class="flex flex-col gap-4 p-4 transition hover:bg-slate-900/45 sm:p-5 lg:flex-row lg:items-center lg:justify-between ${task.status === 'Completed' ? 'bg-emerald-950/10' : ''}">
-                  <!-- Left: Quick Complete + ID + Track + Title + Criteria -->
-                  <div class="flex items-start gap-3.5 lg:max-w-2xl">
-                    <button
-                      onclick="toggleTaskComplete('${task.id}')"
-                      title="Mark task completed"
-                      class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition ${
-                        task.status === 'Completed'
-                          ? 'border-emerald-400 bg-emerald-400 text-obsidian shadow-glow-emerald'
-                          : 'border-slate-600 bg-slateDeep hover:border-sky-400'
-                      }"
-                    >
-                      ${task.status === 'Completed' ? `
-                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      ` : ''}
-                    </button>
+    // ==========================================
+    // RENDER PAGE 2: ROADMAP
+    // ==========================================
+    function renderRoadmapPage() {
+      // Phase Selector Pills
+      const phasePills = document.getElementById('phase-pills');
+      const pillItems = [
+        ...PHASES.map(p => ({ val: p.id, label: p.short })),
+        { val: 'all', label: 'All Phases' }
+      ];
+      phasePills.innerHTML = pillItems.map(item => {
+        const active = selectedPhase === item.val;
+        return `
+          <button
+            onclick="selectPhase(${typeof item.val === 'number' ? item.val : `'${item.val}'`})"
+            class="rounded-xl border px-3 py-1.5 text-xs font-semibold transition ${
+              active
+                ? 'border-sky-400 bg-sky-400/20 text-sky-200'
+                : 'border-slate-800 bg-panel text-slate-400 hover:border-slate-600 hover:text-white'
+            }"
+          >
+            ${item.label}
+          </button>
+        `;
+      }).join('');
 
-                    <div class="space-y-1">
-                      <div class="flex flex-wrap items-center gap-2">
-                        <span class="font-mono text-xs font-bold text-sky-400">#${task.id}</span>
-                        <span class="rounded-md border px-2 py-0.5 font-mono text-[11px] font-semibold ${getTrackBadgeStyle(task.track)}">
-                          ${task.track}
-                        </span>
-                        <h4 class="text-sm font-bold sm:text-base ${task.status === 'Completed' ? 'text-slate-400 line-through' : 'text-white'}">
-                          ${task.title}
-                        </h4>
-                      </div>
-                      <p class="text-xs leading-relaxed text-slate-400 sm:text-sm">${task.desc}</p>
-                    </div>
-                  </div>
+      // Track Filter Pills
+      const trackPills = document.getElementById('track-pills');
+      trackPills.innerHTML = TRACKS.map(tr => {
+        const active = selectedTrack === tr;
+        return `
+          <button
+            onclick="selectTrack('${tr}')"
+            class="rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition ${
+              active
+                ? 'border-indigo-400 bg-indigo-500/20 text-indigo-200'
+                : 'border-slate-800 bg-obsidian/70 text-slate-400 hover:text-slate-200'
+            }"
+          >
+            ${tr}
+          </button>
+        `;
+      }).join('');
 
-                  <!-- Right: Developer Assignee + Target Due Date + Status Dropdown -->
-                  <div class="flex flex-wrap items-center gap-2.5 pl-8 lg:pl-0 lg:justify-end">
-                    <input
-                      type="text"
-                      value="${escapeHtml(task.assignee || '')}"
-                      onchange="updateTask('${task.id}', 'assignee', this.value)"
-                      placeholder="Assign developer..."
-                      aria-label="Developer assignee for ${task.title}"
-                      class="w-36 rounded-xl border border-slate-700/90 bg-slateDeep px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none sm:w-40"
-                    />
-
-                    <input
-                      type="date"
-                      value="${task.dueDate || ''}"
-                      onchange="updateTask('${task.id}', 'dueDate', this.value)"
-                      aria-label="Target due date for ${task.title}"
-                      class="rounded-xl border border-slate-700/90 bg-slateDeep px-2.5 py-1.5 font-mono text-xs text-slate-300 focus:border-sky-400 focus:outline-none"
-                    />
-
-                    <select
-                      onchange="updateTask('${task.id}', 'status', this.value)"
-                      aria-label="Task status for ${task.title}"
-                      class="rounded-xl border px-3 py-1.5 text-xs font-bold focus:outline-none ${getStatusSelectStyle(task.status)}"
-                    >
-                      <option value="Pending" class="bg-slate-900 text-slate-200" ${task.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                      <option value="In Progress" class="bg-slate-900 text-sky-300" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                      <option value="Testing" class="bg-slate-900 text-indigo-300" ${task.status === 'Testing' ? 'selected' : ''}>Testing</option>
-                      <option value="Completed" class="bg-slate-900 text-emerald-300" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
-                    </select>
-                  </div>
-                </div>
-              `).join('')}
+      // Phase Banner
+      const banner = document.getElementById('phase-banner');
+      if (selectedPhase === 'all') {
+        const done = state.tasks.filter(t => t.status === 'Completed').length;
+        banner.innerHTML = `
+          <div>
+            <span class="font-mono text-[11px] font-bold uppercase text-sky-400">Complete Roadmap View</span>
+            <h2 class="text-base font-extrabold text-white">All 6 Engineering Phases</h2>
+            <p class="text-xs text-slate-400">Viewing all tasks across the entire build lifecycle.</p>
+          </div>
+          <span class="font-mono text-sm font-bold text-emerald-400">${done} / ${state.tasks.length} Completed</span>
+        `;
+      } else {
+        const pObj = PHASES.find(p => p.id === selectedPhase);
+        const pTasks = state.tasks.filter(t => t.phase === pObj.id);
+        const pDone = pTasks.filter(t => t.status === 'Completed').length;
+        const pPct = pTasks.length === 0 ? 0 : Math.round((pDone / pTasks.length) * 100);
+        banner.innerHTML = `
+          <div>
+            <span class="font-mono text-[11px] font-bold uppercase text-sky-400">${pObj.short} • ${pObj.weeks}</span>
+            <h2 class="text-base font-extrabold text-white">${pObj.title}</h2>
+            <p class="text-xs text-slate-400">${pObj.focus}</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="font-mono text-xs text-slate-300">${pDone}/${pTasks.length} Done (${pPct}%)</span>
+            <div class="h-2 w-24 overflow-hidden rounded-full bg-obsidian">
+              <div class="h-full rounded-full bg-sky-400 transition-all duration-300" style="width: ${pPct}%"></div>
             </div>
           </div>
         `;
+      }
+
+      // Filter Tasks
+      const query = document.getElementById('task-search').value.trim().toLowerCase();
+      const filtered = state.tasks.filter(t => {
+        const matchPhase = selectedPhase === 'all' || t.phase === selectedPhase;
+        const matchTrack = selectedTrack === 'All' || t.track === selectedTrack;
+        const matchQuery = !query ||
+          t.title.toLowerCase().includes(query) ||
+          t.summary.toLowerCase().includes(query) ||
+          (t.assignee && t.assignee.toLowerCase().includes(query));
+        return matchPhase && matchTrack && matchQuery;
       });
 
-      if (!html) {
-        html = `
-          <div class="glass-panel rounded-2xl p-12 text-center">
-            <p class="font-mono text-sm font-bold text-sky-400">NO MATCHING TASKS FOUND</p>
-            <p class="mt-1 text-sm text-slate-400">Clear your search filter or select "All" status and track pills to view all tasks.</p>
+      const list = document.getElementById('tasks-list');
+      if (filtered.length === 0) {
+        list.innerHTML = `
+          <div class="sleek-card rounded-2xl p-10 text-center">
+            <p class="text-sm font-semibold text-slate-300">No tasks match the current filter.</p>
+            <p class="mt-1 text-xs text-slate-500">Try clearing your search or switching track filters.</p>
           </div>
         `;
+        return;
       }
 
-      container.innerHTML = html;
+      list.innerHTML = filtered.map(t => `
+        <div class="sleek-card rounded-2xl p-4 flex flex-col gap-3.5 lg:flex-row lg:items-center lg:justify-between ${t.status === 'Completed' ? 'opacity-80' : ''}">
+          <!-- Left: Checkbox + Track + Title + 1-line Summary -->
+          <div class="flex items-start gap-3">
+            <button
+              onclick="toggleTaskDone('${t.id}')"
+              aria-label="Toggle completed"
+              class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition ${
+                t.status === 'Completed'
+                  ? 'border-emerald-400 bg-emerald-400 text-obsidian'
+                  : 'border-slate-600 bg-obsidian hover:border-sky-400'
+              }"
+            >
+              ${t.status === 'Completed' ? '<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
+            </button>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-mono text-[11px] font-bold text-sky-400">#${t.id}</span>
+                <span class="rounded-md border px-2 py-0.5 font-mono text-[10px] font-semibold ${trackBadgeClass(t.track)}">${t.track}</span>
+                <h3 class="text-sm font-bold ${t.status === 'Completed' ? 'line-through text-slate-400' : 'text-white'}">${t.title}</h3>
+              </div>
+              <p class="mt-0.5 text-xs text-slate-400">${t.summary}</p>
+            </div>
+          </div>
+
+          <!-- Right: Inline Assignee, Date & Status -->
+          <div class="flex flex-wrap items-center gap-2 pl-8 lg:pl-0 shrink-0">
+            <input
+              type="text"
+              value="${esc(t.assignee)}"
+              onchange="updateTaskField('${t.id}', 'assignee', this.value)"
+              placeholder="Assignee..."
+              class="w-32 rounded-xl border border-slate-700/80 bg-obsidian/90 px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
+            />
+            <input
+              type="date"
+              value="${t.dueDate || ''}"
+              onchange="updateTaskField('${t.id}', 'dueDate', this.value)"
+              class="rounded-xl border border-slate-700/80 bg-obsidian/90 px-2.5 py-1.5 font-mono text-[11px] text-slate-300 focus:border-sky-400 focus:outline-none"
+            />
+            <select
+              onchange="updateTaskField('${t.id}', 'status', this.value)"
+              class="rounded-xl border px-2.5 py-1.5 text-xs font-bold focus:outline-none ${statusSelectClass(t.status)}"
+            >
+              <option value="Pending" class="bg-slate-900 text-slate-200" ${t.status === 'Pending' ? 'selected' : ''}>Pending</option>
+              <option value="In Progress" class="bg-slate-900 text-sky-300" ${t.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+              <option value="Testing" class="bg-slate-900 text-indigo-300" ${t.status === 'Testing' ? 'selected' : ''}>Testing</option>
+              <option value="Completed" class="bg-slate-900 text-emerald-300" ${t.status === 'Completed' ? 'selected' : ''}>Completed</option>
+            </select>
+          </div>
+        </div>
+      `).join('');
     }
 
-    function updateTask(id, field, value) {
-      const task = appState.tasks.find(t => t.id === id);
+    function trackBadgeClass(track) {
+      const map = {
+        'Rider App': 'border-sky-400/35 bg-sky-400/10 text-sky-300',
+        'Driver App': 'border-emerald-400/35 bg-emerald-400/10 text-emerald-300',
+        'Backend': 'border-indigo-400/35 bg-indigo-400/10 text-indigo-300',
+        'Admin': 'border-purple-400/35 bg-purple-400/10 text-purple-300',
+        'QA/Ops': 'border-amber-400/35 bg-amber-400/10 text-amber-300'
+      };
+      return map[track] || 'border-slate-700 bg-slate-800 text-slate-300';
+    }
+
+    function statusSelectClass(status) {
+      if (status === 'Completed') return 'border-emerald-400/45 bg-emerald-500/15 text-emerald-300';
+      if (status === 'In Progress') return 'border-sky-400/45 bg-sky-500/15 text-sky-300';
+      if (status === 'Testing') return 'border-indigo-400/45 bg-indigo-500/15 text-indigo-300';
+      return 'border-slate-700 bg-obsidian text-slate-300';
+    }
+
+    function selectPhase(val) {
+      selectedPhase = val;
+      renderRoadmapPage();
+    }
+
+    function selectTrack(tr) {
+      selectedTrack = tr;
+      renderRoadmapPage();
+    }
+
+    function updateTaskField(id, field, value) {
+      const task = state.tasks.find(t => t.id === id);
       if (task) {
         task[field] = value;
-        saveState(`Task #${id} updated.`);
-        renderRoadmap();
+        saveState(`Task #${id} updated`);
+        renderRoadmapPage();
       }
     }
 
-    function toggleTaskComplete(id) {
-      const task = appState.tasks.find(t => t.id === id);
+    function toggleTaskDone(id) {
+      const task = state.tasks.find(t => t.id === id);
       if (task) {
         task.status = task.status === 'Completed' ? 'Pending' : 'Completed';
-        saveState(`Task #${id} marked ${task.status}.`);
-        renderRoadmap();
+        saveState(`Task #${id}: ${task.status}`);
+        renderRoadmapPage();
       }
     }
 
-    // Modals
-    function openAddTaskModal() {
-      document.getElementById('add-task-modal').classList.remove('hidden');
-      document.getElementById('add-task-modal').classList.add('flex');
+    // ==========================================
+    // RENDER PAGE 3: TECH STACK & OPS
+    // ==========================================
+    function renderOpsPage() {
+      const readyCount = state.stack.filter(s => s.ready).length;
+      document.getElementById('ops-stack-count').textContent = `${readyCount} / ${state.stack.length}`;
+
+      document.getElementById('stack-list').innerHTML = state.stack.map(item => `
+        <button
+          onclick="toggleStack('${item.id}')"
+          class="flex w-full items-center justify-between gap-3 rounded-xl border p-3 text-left transition ${
+            item.ready
+              ? 'border-emerald-400/40 bg-emerald-950/20'
+              : 'border-slate-800 bg-obsidian/80 hover:border-slate-600'
+          }"
+        >
+          <div>
+            <p class="text-xs font-bold text-white">${item.name}</p>
+            <p class="text-[11px] text-slate-400">${item.detail}</p>
+          </div>
+          <span class="shrink-0 rounded-md border px-2 py-0.5 font-mono text-[10px] font-bold ${
+            item.ready
+              ? 'border-emerald-400/45 bg-emerald-400/15 text-emerald-300'
+              : 'border-slate-700 bg-slate-800/80 text-slate-400'
+          }">
+            ${item.ready ? 'READY' : 'PENDING'}
+          </span>
+        </button>
+      `).join('');
+
+      const activeGuards = state.guardrails.filter(g => g.active).length;
+      document.getElementById('ops-guard-count').textContent = `${activeGuards} / ${state.guardrails.length}`;
+
+      document.getElementById('guardrails-list').innerHTML = state.guardrails.map(g => `
+        <button
+          onclick="toggleGuardrail('${g.id}')"
+          class="flex w-full items-center justify-between gap-3 rounded-xl border p-3 text-left transition ${
+            g.active
+              ? 'border-sky-400/40 bg-sky-950/20'
+              : 'border-slate-800 bg-obsidian/80 hover:border-slate-600'
+          }"
+        >
+          <div>
+            <p class="text-xs font-bold text-white">${g.title}</p>
+            <p class="text-[11px] text-slate-400">${g.detail}</p>
+          </div>
+          <span class="shrink-0 rounded-md border px-2 py-0.5 font-mono text-[10px] font-bold ${
+            g.active
+              ? 'border-sky-400/45 bg-sky-400/15 text-sky-300'
+              : 'border-slate-700 bg-slate-800/80 text-slate-400'
+          }">
+            ${g.active ? 'ACTIVE' : 'OPEN'}
+          </span>
+        </button>
+      `).join('');
+    }
+
+    function toggleStack(id) {
+      const item = state.stack.find(s => s.id === id);
+      if (item) {
+        item.ready = !item.ready;
+        saveState(`${item.name}: ${item.ready ? 'Ready' : 'Pending'}`);
+        renderOpsPage();
+      }
+    }
+
+    function toggleGuardrail(id) {
+      const item = state.guardrails.find(g => g.id === id);
+      if (item) {
+        item.active = !item.active;
+        saveState(`${item.title}: ${item.active ? 'Active' : 'Open'}`);
+        renderOpsPage();
+      }
+    }
+
+    // ==========================================
+    // RENDER PAGE 4: SOURCE CODE
+    // ==========================================
+    function renderSourcePage() {
+      const code = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      document.getElementById('source-viewer').value = code;
+    }
+
+    function copyHtmlCode() {
+      const box = document.getElementById('source-viewer');
+      if (!box.value) renderSourcePage();
+      box.select();
+      box.setSelectionRange(0, 999999);
+      document.execCommand('copy');
+      showToast('HTML code copied to clipboard');
+    }
+
+    function downloadHtmlFile() {
+      const code = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      triggerDownload(code, 'uber_dev_tracker.html', 'text/html;charset=utf-8');
+      showToast('Downloaded uber_dev_tracker.html');
+    }
+
+    // ==========================================
+    // EXPORTS (.TXT & .DOC)
+    // ==========================================
+    function exportTxtReport() {
+      const total = state.tasks.length;
+      const done = state.tasks.filter(t => t.status === 'Completed').length;
+      const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+
+      const out = [
+        'UBER-CLONE DEVELOPER COMMAND CENTER — PROGRESS REPORT',
+        `Generated: ${new Date().toLocaleString()}`,
+        `Overall Completion: ${pct}% (${done}/${total} tasks completed)`,
+        '====================================================================\n',
+        'TECH STACK READINESS:',
+        ...state.stack.map(s => `[${s.ready ? 'READY  ' : 'PENDING'}] ${s.name} — ${s.detail}`),
+        '\nWEEKLY MANAGEMENT GUARDRAILS:',
+        ...state.guardrails.map(g => `[${g.active ? 'ACTIVE' : 'OPEN  '}] ${g.title} — ${g.detail}`),
+        '\n6-PHASE ENGINEERING ROADMAP:'
+      ];
+
+      PHASES.forEach(p => {
+        const pTasks = state.tasks.filter(t => t.phase === p.id);
+        out.push(`\n--- ${p.short.toUpperCase()}: ${p.title} (${p.weeks}) ---`);
+        pTasks.forEach(t => {
+          out.push(`[${t.status.toUpperCase().padEnd(11)}] #${t.id} [${t.track}] ${t.title}`);
+          out.push(`              Assignee: ${t.assignee || 'Unassigned'} | Due: ${t.dueDate || 'TBD'}`);
+          out.push(`              Scope: ${t.summary}`);
+        });
+      });
+
+      triggerDownload(out.join('\n'), `Uber-Clone-Roadmap-${new Date().toISOString().slice(0, 10)}.txt`, 'text/plain;charset=utf-8');
+      showToast('Exported .TXT report');
+    }
+
+    function exportWordReport() {
+      const total = state.tasks.length;
+      const done = state.tasks.filter(t => t.status === 'Completed').length;
+      const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+
+      const htmlDoc = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset="utf-8"><title>Uber-Clone Roadmap Report</title>
+        <style>
+          body { font-family: Calibri, Arial, sans-serif; color: #1e293b; }
+          h1 { color: #0f172a; border-bottom: 2px solid #0284c7; padding-bottom: 6px; }
+          h2 { color: #0369a1; margin-top: 20px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 10pt; }
+          th { background: #0f172a; color: #fff; text-align: left; padding: 7px; border: 1px solid #334155; }
+          td { padding: 6px 7px; border: 1px solid #cbd5e1; }
+        </style></head>
+        <body>
+          <h1>Uber-Clone Developer Command Center — Progress Report</h1>
+          <p><strong>Generated:</strong> ${esc(new Date().toLocaleString())} &nbsp;|&nbsp; <strong>Completion:</strong> ${pct}% (${done}/${total} tasks)</p>
+          <h2>6-Phase Engineering Roadmap</h2>
+          <table>
+            <tr><th>ID</th><th>Phase</th><th>Track</th><th>Task &amp; Deliverable</th><th>Assignee</th><th>Due Date</th><th>Status</th></tr>
+            ${state.tasks.map(t => `
+              <tr>
+                <td>#${esc(t.id)}</td>
+                <td>Phase ${t.phase}</td>
+                <td>${esc(t.track)}</td>
+                <td><strong>${esc(t.title)}</strong><br/>${esc(t.summary)}</td>
+                <td>${esc(t.assignee || 'Unassigned')}</td>
+                <td>${esc(t.dueDate || '—')}</td>
+                <td><strong>${esc(t.status)}</strong></td>
+              </tr>
+            `).join('')}
+          </table>
+          <h2>Tech Stack Readiness</h2>
+          <table>
+            <tr><th>Module</th><th>Specification</th><th>Status</th></tr>
+            ${state.stack.map(s => `<tr><td><strong>${esc(s.name)}</strong></td><td>${esc(s.detail)}</td><td>${s.ready ? 'READY' : 'PENDING'}</td></tr>`).join('')}
+          </table>
+        </body></html>
+      `;
+
+      triggerDownload('\ufeff' + htmlDoc, `Uber-Clone-Roadmap-${new Date().toISOString().slice(0, 10)}.doc`, 'application/msword');
+      showToast('Exported Word .DOC report');
+    }
+
+    function triggerDownload(content, filename, mime) {
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ==========================================
+    // MODALS (ADD TASK & RESET)
+    // ==========================================
+    function openAddModal() {
+      if (typeof selectedPhase === 'number') {
+        document.getElementById('in-phase').value = String(selectedPhase);
+      }
+      document.getElementById('add-modal').classList.remove('hidden');
+      document.getElementById('add-modal').classList.add('flex');
     }
 
     function openResetModal() {
       document.getElementById('reset-modal').classList.remove('hidden');
       document.getElementById('reset-modal').classList.add('flex');
-    }
-
-    function openSourceModal() {
-      const fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-      document.getElementById('source-code-box').value = fullHtml;
-      document.getElementById('source-modal').classList.remove('hidden');
-      document.getElementById('source-modal').classList.add('flex');
     }
 
     function closeModal(id) {
@@ -1330,289 +1042,50 @@
       el.classList.remove('flex');
     }
 
-    function handleCreateTask(e) {
+    function createNewTask(e) {
       e.preventDefault();
-      const phase = parseInt(document.getElementById('new-task-phase').value, 10);
-      const track = document.getElementById('new-task-track').value;
-      const title = document.getElementById('new-task-title').value.trim();
-      const desc = document.getElementById('new-task-desc').value.trim();
-      const assignee = document.getElementById('new-task-assignee').value.trim();
-      const dueDate = document.getElementById('new-task-date').value;
+      const phase = parseInt(document.getElementById('in-phase').value, 10);
+      const track = document.getElementById('in-track').value;
+      const title = document.getElementById('in-title').value.trim();
+      const summary = document.getElementById('in-summary').value.trim();
+      const assignee = document.getElementById('in-assignee').value.trim();
+      const dueDate = document.getElementById('in-date').value;
 
-      const countInPhase = appState.tasks.filter(t => t.phase === phase).length + 1;
-      const newId = `${phase}.${countInPhase}`;
+      const nextNum = state.tasks.filter(t => t.phase === phase).length + 1;
+      const newId = `${phase}.${nextNum}`;
 
-      appState.tasks.push({
+      state.tasks.push({
         id: newId,
         phase,
         track,
         title,
-        desc,
+        summary,
         assignee,
         dueDate,
         status: 'Pending'
       });
 
-      appState.expandedPhases[phase] = true;
-      saveState(`Created Task #${newId} in Phase ${phase}.`);
-      document.getElementById('add-task-form').reset();
-      closeModal('add-task-modal');
-      renderRoadmap();
+      selectedPhase = phase;
+      saveState(`Added Task #${newId}`);
+      e.target.reset();
+      closeModal('add-modal');
+      renderRoadmapPage();
     }
 
-    function confirmResetAll() {
+    function confirmReset() {
       localStorage.removeItem(STORAGE_KEY);
-      appState = {
-        tasks: JSON.parse(JSON.stringify(DEFAULT_TASKS)),
-        techStack: JSON.parse(JSON.stringify(DEFAULT_TECH_STACK)),
-        guardrails: JSON.parse(JSON.stringify(DEFAULT_GUARDRAILS)),
-        expandedPhases: { 1: true, 2: true, 3: true, 4: true, 5: true, 6: true }
+      state = {
+        tasks: JSON.parse(JSON.stringify(INITIAL_TASKS)),
+        stack: JSON.parse(JSON.stringify(INITIAL_STACK)),
+        guardrails: JSON.parse(JSON.stringify(INITIAL_GUARDRAILS))
       };
-      saveState('Command Center reset to defaults.');
+      saveState('All progress reset');
       closeModal('reset-modal');
-      renderTechStack();
-      renderGuardrails();
-      renderRoadmap();
+      switchPage(currentPage);
     }
 
-    // Export .TXT Plain-Text Report
-    function exportTextReport() {
-      const dateStr = new Date().toLocaleString();
-      const total = appState.tasks.length;
-      const completed = appState.tasks.filter(t => t.status === 'Completed').length;
-      const inProgress = appState.tasks.filter(t => t.status === 'In Progress').length;
-      const testing = appState.tasks.filter(t => t.status === 'Testing').length;
-      const pending = appState.tasks.filter(t => t.status === 'Pending').length;
-      const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
-
-      let lines = [];
-      lines.push('================================================================================');
-      lines.push('UBER-CLONE DEVELOPER COMMAND CENTER — ENGINEERING PROGRESS REPORT');
-      lines.push(`Generated On: ${dateStr}`);
-      lines.push('================================================================================\n');
-
-      lines.push('1. EXECUTIVE SUMMARY');
-      lines.push('--------------------------------------------------------------------------------');
-      lines.push(`Overall Completion : ${pct}% (${completed} of ${total} tasks completed)`);
-      lines.push(`Completed          : ${completed}`);
-      lines.push(`In Progress        : ${inProgress}`);
-      lines.push(`In Testing         : ${testing}`);
-      lines.push(`Pending            : ${pending}\n`);
-
-      lines.push('2. TECH STACK READINESS');
-      lines.push('--------------------------------------------------------------------------------');
-      appState.techStack.forEach(s => {
-        lines.push(`[${s.configured ? 'CONFIGURED' : 'PENDING   '}] ${s.category}: ${s.stack}`);
-      });
-      lines.push('');
-
-      lines.push('3. WEEKLY MANAGEMENT & BOTTLENECK GUARDRAILS');
-      lines.push('--------------------------------------------------------------------------------');
-      appState.guardrails.forEach(g => {
-        lines.push(`[${g.checked ? 'ACTIVE' : 'OPEN  '}] ${g.title}`);
-        lines.push(`         Guidance: ${g.desc}`);
-        if (g.note) lines.push(`         Lead Note: ${g.note}`);
-      });
-      lines.push('');
-
-      lines.push('4. 6-PHASE ENGINEERING ROADMAP & TASK BREAKDOWN');
-      lines.push('================================================================================');
-      PHASES_META.forEach(phase => {
-        const pTasks = appState.tasks.filter(t => t.phase === phase.id);
-        const pDone = pTasks.filter(t => t.status === 'Completed').length;
-        const pPct = pTasks.length === 0 ? 0 : Math.round((pDone / pTasks.length) * 100);
-
-        lines.push(`\n${phase.title.toUpperCase()} (${phase.weeks}) — ${pPct}% Complete (${pDone}/${pTasks.length})`);
-        lines.push('--------------------------------------------------------------------------------');
-        pTasks.forEach(t => {
-          const dev = t.assignee && t.assignee.trim() ? t.assignee.trim() : 'Unassigned';
-          const due = t.dueDate ? t.dueDate : 'No Due Date';
-          lines.push(`[${t.status.toUpperCase().padEnd(11)}] #${t.id} (${t.track}) — ${t.title}`);
-          lines.push(`              Assignee: ${dev} | Target Date: ${due}`);
-          lines.push(`              Criteria: ${t.desc}`);
-        });
-      });
-
-      const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Uber-Clone-Dev-Roadmap-Report-${new Date().toISOString().slice(0, 10)}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showToast('Exported plain-text report (.TXT)');
-    }
-
-    // Export Word (.DOC) Document with Styled Executive Tables
-    function exportWordReport() {
-      const dateStr = new Date().toLocaleString();
-      const total = appState.tasks.length;
-      const completed = appState.tasks.filter(t => t.status === 'Completed').length;
-      const inProgress = appState.tasks.filter(t => t.status === 'In Progress').length;
-      const testing = appState.tasks.filter(t => t.status === 'Testing').length;
-      const pending = appState.tasks.filter(t => t.status === 'Pending').length;
-      const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
-
-      let docHtml = `
-        <html xmlns:o='urn:schemas-microsoft-com:office:office'
-              xmlns:w='urn:schemas-microsoft-com:office:word'
-              xmlns='http://www.w3.org/TR/REC-html40'>
-        <head>
-          <meta charset="utf-8" />
-          <title>Uber-Clone Developer Roadmap Report</title>
-          <style>
-            body { font-family: Calibri, Arial, sans-serif; color: #1E293B; line-height: 1.45; }
-            h1 { color: #0F172A; font-size: 22pt; border-bottom: 3px solid #0284C7; padding-bottom: 6px; }
-            h2 { color: #0369A1; font-size: 15pt; margin-top: 22px; border-bottom: 1px solid #CBD5E1; padding-bottom: 4px; }
-            h3 { color: #0F172A; font-size: 13pt; margin-top: 18px; background: #F1F5F9; padding: 6px 10px; }
-            p.meta { color: #475569; font-size: 10pt; }
-            table { width: 100%; border-collapse: collapse; margin-top: 8px; margin-bottom: 16px; font-size: 10pt; }
-            th { background-color: #0F172A; color: #FFFFFF; font-weight: bold; text-align: left; padding: 8px; border: 1px solid #334155; }
-            td { padding: 7px 8px; border: 1px solid #CBD5E1; vertical-align: top; }
-            tr:nth-child(even) td { background-color: #F8FAFC; }
-            .badge-done { color: #059669; font-weight: bold; }
-            .badge-prog { color: #0284C7; font-weight: bold; }
-            .badge-test { color: #4F46E5; font-weight: bold; }
-            .badge-pend { color: #64748B; font-weight: bold; }
-          </style>
-        </head>
-        <body>
-          <h1>Uber-Clone Developer Command Center — Progress Report</h1>
-          <p class="meta"><strong>Generated:</strong> ${escapeHtml(dateStr)} &nbsp;|&nbsp; <strong>6-Phase Engineering Roadmap &amp; Sprint Tracker</strong></p>
-
-          <h2>1. Executive KPI Summary</h2>
-          <table>
-            <tr>
-              <th>Overall Completion</th>
-              <th>Total Tasks</th>
-              <th>Completed</th>
-              <th>In Progress</th>
-              <th>In Testing</th>
-              <th>Pending</th>
-            </tr>
-            <tr>
-              <td><strong>${pct}%</strong></td>
-              <td>${total}</td>
-              <td class="badge-done">${completed}</td>
-              <td class="badge-prog">${inProgress}</td>
-              <td class="badge-test">${testing}</td>
-              <td class="badge-pend">${pending}</td>
-            </tr>
-          </table>
-
-          <h2>2. Recommended Tech Stack Readiness</h2>
-          <table>
-            <tr>
-              <th style="width:28%;">Layer</th>
-              <th style="width:36%;">Technology Stack</th>
-              <th style="width:20%;">Setup Status</th>
-              <th style="width:16%;">Notes</th>
-            </tr>
-            ${appState.techStack.map(s => `
-              <tr>
-                <td><strong>${escapeHtml(s.category)}</strong></td>
-                <td>${escapeHtml(s.stack)}</td>
-                <td class="${s.configured ? 'badge-done' : 'badge-pend'}">${s.configured ? 'CONFIGURED' : 'PENDING'}</td>
-                <td>${escapeHtml(s.desc)}</td>
-              </tr>
-            `).join('')}
-          </table>
-
-          <h2>3. Weekly Developer Management &amp; Guardrails</h2>
-          <table>
-            <tr>
-              <th style="width:32%;">Management Ritual / Watch Item</th>
-              <th style="width:14%;">Status</th>
-              <th style="width:34%;">Standard Operating Guideline</th>
-              <th style="width:20%;">Lead Note</th>
-            </tr>
-            ${appState.guardrails.map(g => `
-              <tr>
-                <td><strong>${escapeHtml(g.title)}</strong></td>
-                <td class="${g.checked ? 'badge-done' : 'badge-pend'}">${g.checked ? 'ACTIVE' : 'OPEN'}</td>
-                <td>${escapeHtml(g.desc)}</td>
-                <td>${escapeHtml(g.note || '—')}</td>
-              </tr>
-            `).join('')}
-          </table>
-
-          <h2>4. Phase-by-Phase Engineering Roadmap Matrix</h2>
-          ${PHASES_META.map(phase => {
-            const pTasks = appState.tasks.filter(t => t.phase === phase.id);
-            const pDone = pTasks.filter(t => t.status === 'Completed').length;
-            const pPct = pTasks.length === 0 ? 0 : Math.round((pDone / pTasks.length) * 100);
-            return `
-              <h3>${escapeHtml(phase.title)} (${escapeHtml(phase.weeks)}) — ${pPct}% Complete (${pDone}/${pTasks.length})</h3>
-              <table>
-                <tr>
-                  <th style="width:7%;">ID</th>
-                  <th style="width:16%;">Track</th>
-                  <th style="width:39%;">Task &amp; Acceptance Criteria</th>
-                  <th style="width:14%;">Assignee</th>
-                  <th style="width:12%;">Due Date</th>
-                  <th style="width:12%;">Status</th>
-                </tr>
-                ${pTasks.map(t => {
-                  const cls = t.status === 'Completed' ? 'badge-done' : t.status === 'In Progress' ? 'badge-prog' : t.status === 'Testing' ? 'badge-test' : 'badge-pend';
-                  return `
-                    <tr>
-                      <td><strong>#${escapeHtml(t.id)}</strong></td>
-                      <td>${escapeHtml(t.track)}</td>
-                      <td><strong>${escapeHtml(t.title)}</strong><br/><span>${escapeHtml(t.desc)}</span></td>
-                      <td>${escapeHtml(t.assignee || 'Unassigned')}</td>
-                      <td>${escapeHtml(t.dueDate || '—')}</td>
-                      <td class="${cls}">${escapeHtml(t.status)}</td>
-                    </tr>
-                  `;
-                }).join('')}
-              </table>
-            `;
-          }).join('')}
-        </body>
-        </html>
-      `;
-
-      const blob = new Blob(['\ufeff', docHtml], { type: 'application/msword' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Uber-Clone-Dev-Roadmap-Report-${new Date().toISOString().slice(0, 10)}.doc`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showToast('Exported Microsoft Word report (.DOC)');
-    }
-
-    function downloadHTMLFile() {
-      const fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-      const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'uber_dev_tracker.html';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showToast('Downloaded uber_dev_tracker.html');
-    }
-
-    function copySourceCode() {
-      const box = document.getElementById('source-code-box');
-      box.select();
-      box.setSelectionRange(0, 999999);
-      document.execCommand('copy');
-      showToast('Full HTML source code copied to clipboard!');
-    }
-
-    // Boot Command Center
-    renderFilterPills();
-    renderTechStack();
-    renderGuardrails();
-    renderRoadmap();
+    // Initialize App
+    switchPage('overview');
   </script>
 </body>
 </html>
