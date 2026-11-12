@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Uber-Clone Developer Command Center</title>
+  <title>@ingine tech — Taxi App Command Center</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -18,998 +17,714 @@
             mono: ['JetBrains Mono', 'monospace'],
           },
           colors: {
-            obsidian: '#070B14',
-            panel: '#0F172A',
-            panelLight: '#162036',
-            cyanGlow: '#38BDF8',
-            indigoGlow: '#818CF8',
-            emeraldGlow: '#34D399',
+            obsidian: '#060A13',
+            panel: '#0D1424',
+            card: '#111B2E',
+            cyanGlow: '#06B6D4',
+            indigoGlow: '#6366F1',
           }
         }
       }
-    };
+    }
   </script>
   <style>
     body {
-      background-color: #070B14;
-      color: #F8FAFC;
+      background-color: #060A13;
+      color: #E2E8F0;
       background-image:
-        radial-gradient(circle at 15% 10%, rgba(56, 189, 248, 0.08), transparent 38%),
-        radial-gradient(circle at 85% 20%, rgba(129, 140, 248, 0.09), transparent 42%);
+        radial-gradient(circle at 12% 15%, rgba(6, 182, 212, 0.08), transparent 35%),
+        radial-gradient(circle at 88% 85%, rgba(99, 102, 241, 0.08), transparent 35%);
+      min-height: 100vh;
     }
 
-    /* Smooth View Page Transition */
+    /* Smooth Page Transitions */
     .page-view {
       display: none;
-      opacity: 0;
-      transform: translateY(10px);
+      animation: pageEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     .page-view.active {
       display: block;
-      animation: pageFadeSlide 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-    @keyframes pageFadeSlide {
+    @keyframes pageEnter {
       from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(10px) scale(0.99);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
       }
     }
 
-    /* Sleek Elevated Card Micro-Interactions */
-    .sleek-card {
-      background: rgba(15, 23, 42, 0.88);
+    /* Glass Card & Micro-Interactions */
+    .glass-card {
+      background: rgba(17, 27, 46, 0.78);
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      border: 1px solid rgba(56, 189, 248, 0.14);
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
     }
-    .sleek-card:hover {
-      border-color: rgba(56, 189, 248, 0.32);
-      box-shadow: 0 8px 28px -8px rgba(56, 189, 248, 0.16);
+    .glass-card:hover {
+      border-color: rgba(6, 182, 212, 0.38);
+      box-shadow: 0 8px 28px -6px rgba(6, 182, 212, 0.14);
     }
-    .phase-card-hover:hover {
+    .clickable-card:hover {
       transform: translateY(-2px);
     }
 
-    /* Animated Circular Ring */
-    .ring-progress {
-      transition: stroke-dashoffset 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    /* Progress Ring Animation */
+    .ring-circle {
+      transition: stroke-dashoffset 0.75s cubic-bezier(0.22, 1, 0.36, 1);
       transform: rotate(-90deg);
       transform-origin: 50% 50%;
     }
 
     /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 7px; height: 7px; }
-    ::-webkit-scrollbar-track { background: #070B14; }
-    ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #38BDF8; }
-
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(0.8);
-      cursor: pointer;
-    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #060A13; }
+    ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #06B6D4; }
   </style>
 </head>
-<body class="min-h-screen antialiased selection:bg-sky-400/25 selection:text-sky-200">
+<body class="antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
 
-  <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 pointer-events-none flex items-center gap-2.5 rounded-xl border border-sky-400/40 bg-panel/95 px-4 py-2.5 text-xs font-semibold text-sky-200 shadow-xl opacity-0 translate-y-2 transition-all duration-300">
-    <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-    <span id="toast-text">Saved</span>
-  </div>
-
-  <!-- Compact Top Navigation Bar -->
-  <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-obsidian/90 backdrop-blur-md">
-    <div class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+  <!-- Top Navigation Bar -->
+  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-[#060A13]/90 backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
       <!-- Brand -->
       <div class="flex items-center gap-3">
-        <div class="flex h-9 w-9 items-center justify-center rounded-xl border border-sky-400/35 bg-sky-500/10 text-sky-400 shadow-sm">
-          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 font-mono font-bold text-slate-950 text-sm">
+          IT
         </div>
         <div>
-          <h1 class="text-base font-extrabold tracking-tight text-white">Uber-Clone Dev Tracker</h1>
-          <p class="font-mono text-[11px] text-slate-400">6-Phase Engineering Command Center</p>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-sm sm:text-base tracking-tight text-white">@ingine tech</span>
+            <span class="hidden sm:inline-block text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/25">PRD v1.0</span>
+          </div>
+          <p class="text-[11px] text-slate-400 hidden sm:block">8-Week Taxi Platform Tracker • ₹3,80,000 Quote</p>
         </div>
       </div>
 
-      <!-- Page Navigation Tabs -->
-      <nav class="flex items-center gap-1 rounded-xl border border-slate-800 bg-panel/90 p-1" aria-label="Primary Pages">
-        <button onclick="switchPage('overview')" data-nav="overview" class="nav-tab rounded-lg px-3.5 py-1.5 text-xs font-semibold transition">
+      <!-- Multi-Page Navigation Pills -->
+      <nav class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+        <button onclick="switchPage('overview')" id="nav-overview" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
           Overview
         </button>
-        <button onclick="switchPage('roadmap')" data-nav="roadmap" class="nav-tab rounded-lg px-3.5 py-1.5 text-xs font-semibold transition">
-          Roadmap
+        <button onclick="switchPage('roadmap')" id="nav-roadmap" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition-all border border-transparent">
+          8-Week Roadmap
         </button>
-        <button onclick="switchPage('ops')" data-nav="ops" class="nav-tab rounded-lg px-3.5 py-1.5 text-xs font-semibold transition">
-          Tech Stack &amp; Ops
+        <button onclick="switchPage('milestones')" id="nav-milestones" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition-all border border-transparent">
+          Milestones & Costs
         </button>
-        <button onclick="switchPage('source')" data-nav="source" class="nav-tab rounded-lg px-3.5 py-1.5 text-xs font-semibold transition">
-          Source Code
+        <button onclick="switchPage('code')" id="nav-code" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition-all border border-transparent">
+          Source & Export
         </button>
       </nav>
+
+      <!-- Quick Export Buttons -->
+      <div class="hidden md:flex items-center gap-2">
+        <button onclick="exportTXT()" class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+          Export .TXT
+        </button>
+        <button onclick="exportDOC()" class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 transition">
+          Export .DOC
+        </button>
+      </div>
     </div>
   </header>
 
-  <main class="mx-auto max-w-6xl px-4 py-7 sm:px-6">
+  <!-- Main Content Container -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
 
-    <!-- =========================================================
-         PAGE 1: OVERVIEW
-         ========================================================= -->
+    <!-- ==================== PAGE 1: OVERVIEW ==================== -->
     <section id="page-overview" class="page-view active space-y-6">
-      <!-- Compact Executive KPI Strip -->
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <!-- Ring Card -->
-        <div class="sleek-card flex items-center gap-4 rounded-2xl p-5">
-          <div class="relative h-16 w-16 shrink-0">
-            <svg class="h-16 w-16" viewBox="0 0 64 64">
-              <circle cx="32" cy="32" r="26" fill="none" stroke="#1E293B" stroke-width="6" />
-              <circle id="kpi-ring" class="ring-progress" cx="32" cy="32" r="26" fill="none" stroke="#38BDF8" stroke-width="6" stroke-linecap="round" stroke-dasharray="163.36" stroke-dashoffset="163.36" />
+      <!-- Top Hero Telemetry -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- Circular Progress Card -->
+        <div class="glass-card rounded-2xl p-5 flex items-center gap-5">
+          <div class="relative w-24 h-24 flex-shrink-0">
+            <svg class="w-24 h-24" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" stroke="#1E293B" stroke-width="9" fill="transparent" />
+              <circle id="overall-ring" class="ring-circle" cx="50" cy="50" r="40" stroke="url(#gradCyan)" stroke-width="9" stroke-linecap="round" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="251.2" />
+              <defs>
+                <linearGradient id="gradCyan" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#06B6D4" />
+                  <stop offset="100%" stop-color="#6366F1" />
+                </linearGradient>
+              </defs>
             </svg>
-            <span id="kpi-ring-text" class="absolute inset-0 flex items-center justify-center font-mono text-xs font-bold text-white">0%</span>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span id="overall-pct" class="text-lg font-bold text-white font-mono">0%</span>
+              <span class="text-[10px] text-slate-400">DONE</span>
+            </div>
           </div>
           <div>
-            <p class="font-mono text-[11px] uppercase tracking-wider text-slate-400">Overall Progress</p>
-            <p id="kpi-ring-sub" class="mt-0.5 text-sm font-bold text-sky-400">0 of 20 Tasks</p>
+            <span class="text-[11px] font-mono uppercase tracking-wider text-cyan-400">Execution Status</span>
+            <h1 class="text-lg font-bold text-white mt-0.5">MVP Build & Go-Live</h1>
+            <p id="overall-counts" class="text-xs text-slate-400 mt-1">0 of 16 deliverables completed</p>
+            <div class="mt-2.5 flex items-center gap-2 text-[11px]">
+              <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Bike • Auto • Cab</span>
+              <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Daily Fee Model</span>
+            </div>
           </div>
         </div>
 
-        <!-- Completed Card -->
-        <div class="sleek-card flex flex-col justify-center rounded-2xl p-5">
-          <p class="font-mono text-[11px] uppercase tracking-wider text-slate-400">Tasks Completed</p>
-          <div class="mt-1 flex items-baseline gap-2">
-            <span id="kpi-done" class="font-mono text-3xl font-extrabold text-emerald-400">0</span>
-            <span class="text-xs text-slate-400">shipped</span>
+        <!-- Financial & Delivery Summary -->
+        <div class="glass-card rounded-2xl p-5 lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="bg-slate-900/70 rounded-xl p-3.5 border border-slate-800/80">
+            <span class="text-[11px] text-slate-400">All-Inclusive Quote</span>
+            <div class="text-lg font-bold text-white font-mono mt-1">₹3,80,000</div>
+            <span class="text-[10px] text-cyan-400">8 Weeks Delivery</span>
           </div>
-        </div>
-
-        <!-- Active / Testing Card -->
-        <div class="sleek-card flex flex-col justify-center rounded-2xl p-5">
-          <p class="font-mono text-[11px] uppercase tracking-wider text-slate-400">Active &amp; Testing</p>
-          <div class="mt-1 flex items-baseline gap-2">
-            <span id="kpi-active" class="font-mono text-3xl font-extrabold text-indigo-400">0</span>
-            <span class="text-xs text-slate-400">in sprint</span>
+          <div class="bg-slate-900/70 rounded-xl p-3.5 border border-slate-800/80">
+            <span class="text-[11px] text-slate-400">Core Development</span>
+            <div class="text-lg font-bold text-emerald-400 font-mono mt-1">₹2,95,000</div>
+            <span class="text-[10px] text-slate-400">Apps + Admin + QA</span>
           </div>
-        </div>
-
-        <!-- Target Launch Status Card -->
-        <div class="sleek-card flex flex-col justify-center rounded-2xl p-5">
-          <p class="font-mono text-[11px] uppercase tracking-wider text-slate-400">Target Launch Status</p>
-          <p id="kpi-launch-status" class="mt-1.5 text-sm font-bold text-white">Phase 1: Discovery</p>
-          <p id="kpi-stack-badge" class="mt-0.5 font-mono text-[11px] text-emerald-400">Stack: 0/8 Ready</p>
+          <div class="bg-slate-900/70 rounded-xl p-3.5 border border-slate-800/80">
+            <span class="text-[11px] text-slate-400">Store Launch</span>
+            <div class="text-lg font-bold text-indigo-400 font-mono mt-1">₹19,900</div>
+            <span class="text-[10px] text-slate-400">Play + App Store</span>
+          </div>
+          <div class="bg-slate-900/70 rounded-xl p-3.5 border border-slate-800/80">
+            <span class="text-[11px] text-slate-400">12-Mo Ops + Buffer</span>
+            <div class="text-lg font-bold text-amber-400 font-mono mt-1">₹65,100</div>
+            <span class="text-[10px] text-slate-400">₹61k Ops + ₹4.1k Buffer</span>
+          </div>
         </div>
       </div>
 
-      <!-- 6-Phase Visual Roadmap Grid -->
-      <div class="space-y-3">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-lg font-bold text-white">6-Phase Engineering Roadmap</h2>
-            <p class="text-xs text-slate-400">Click any phase card to open and manage its tasks directly.</p>
-          </div>
-          <button onclick="openPhaseInRoadmap('all')" class="text-xs font-semibold text-sky-400 hover:text-sky-300">
-            View All Phases &rarr;
-          </button>
+      <!-- Compact 5-Phase Roadmap Grid -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold text-white">5-Phase Execution Blueprint (Click any phase to manage tasks)</h2>
+          <button onclick="resetAllData()" class="text-[11px] text-slate-400 hover:text-rose-400 transition">Reset Tracker</button>
         </div>
-
-        <div id="overview-phases-grid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <!-- Rendered dynamically -->
-        </div>
+        <div id="overview-phase-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       </div>
 
-      <!-- Quick Export & Reset Bar -->
-      <div class="sleek-card flex flex-col justify-between gap-3 rounded-2xl p-4 sm:flex-row sm:items-center">
-        <div class="flex items-center gap-2 text-xs text-slate-400">
-          <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
-          <span>All updates save automatically in your browser.</span>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <button onclick="exportTxtReport()" class="rounded-xl border border-slate-700 bg-panelLight px-3.5 py-2 text-xs font-semibold text-slate-200 transition hover:border-sky-400/50 hover:text-sky-300">
-            Export .TXT Report
-          </button>
-          <button onclick="exportWordReport()" class="rounded-xl border border-emerald-500/35 bg-emerald-500/10 px-3.5 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/20">
-            Export Word .DOC
-          </button>
-          <button onclick="switchPage('source')" class="rounded-xl border border-indigo-400/35 bg-indigo-500/10 px-3.5 py-2 text-xs font-semibold text-indigo-300 transition hover:bg-indigo-500/20">
-            Copy / Download Code
-          </button>
-          <button onclick="openResetModal()" class="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-300 transition hover:bg-rose-500/20">
-            Reset
-          </button>
+      <!-- Tech Stack Strip -->
+      <div class="glass-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+        <div class="text-xs font-medium text-slate-300">Official Stack:</div>
+        <div class="flex flex-wrap gap-2 text-[11px] font-mono">
+          <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-cyan-300">Flutter (iOS + Android)</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-cyan-300">Flutter Web Admin</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-indigo-300">Firebase Blaze + Functions</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-indigo-300">Cloud VPS (Node.js)</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-emerald-300">Google Maps Platform</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-amber-300">Razorpay + DLT SMS</span>
         </div>
       </div>
     </section>
 
-    <!-- =========================================================
-         PAGE 2: ROADMAP (PHASE-FOCUSED)
-         ========================================================= -->
+    <!-- ==================== PAGE 2: 8-WEEK ROADMAP ==================== -->
     <section id="page-roadmap" class="page-view space-y-5">
-      <!-- Phase Selector Pills -->
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div id="phase-pills" class="flex flex-wrap items-center gap-1.5">
-          <!-- Rendered dynamically -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-base font-bold text-white">Developer Task & Phase Manager</h2>
+          <p class="text-xs text-slate-400">Assign engineers, set target dates, and track real-time completion across all 5 phases.</p>
         </div>
-
-        <button onclick="openAddModal()" class="inline-flex items-center gap-1.5 rounded-xl bg-sky-500 px-3.5 py-2 text-xs font-bold text-obsidian shadow-sm transition hover:bg-sky-400 active:scale-95">
-          <span>+ Add Task</span>
-        </button>
+        <!-- Phase Filter Tabs -->
+        <div id="phase-filter-bar" class="flex flex-wrap gap-1.5"></div>
       </div>
 
-      <!-- Compact Track Filter & Search Bar -->
-      <div class="sleek-card flex flex-col gap-3 rounded-2xl p-4 md:flex-row md:items-center md:justify-between">
-        <div id="track-pills" class="flex flex-wrap items-center gap-1.5">
-          <!-- Rendered dynamically -->
-        </div>
+      <!-- Focused Phase Header Banner -->
+      <div id="active-phase-banner" class="glass-card rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"></div>
 
-        <div class="relative w-full md:w-64">
-          <input
-            type="text"
-            id="task-search"
-            oninput="renderRoadmapPage()"
-            placeholder="Search task or developer..."
-            class="w-full rounded-xl border border-slate-700/80 bg-obsidian/90 px-3.5 py-1.5 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
-          />
-        </div>
-      </div>
-
-      <!-- Active Phase Header Banner -->
-      <div id="phase-banner" class="sleek-card flex flex-col justify-between gap-3 rounded-2xl p-5 sm:flex-row sm:items-center">
-        <!-- Rendered dynamically -->
-      </div>
-
-      <!-- Clean Task List -->
-      <div id="tasks-list" class="space-y-3">
-        <!-- Rendered dynamically -->
-      </div>
+      <!-- Compact Task List -->
+      <div id="roadmap-task-list" class="space-y-3"></div>
     </section>
 
-    <!-- =========================================================
-         PAGE 3: TECH STACK & OPS
-         ========================================================= -->
-    <section id="page-ops" class="page-view">
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <!-- Left: Core Tech Stack Readiness -->
-        <div class="sleek-card rounded-2xl p-5 sm:p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-base font-bold text-white">Core Tech Stack Readiness</h2>
-              <p class="text-xs text-slate-400">Click items to toggle environment setup status.</p>
-            </div>
-            <span id="ops-stack-count" class="rounded-full border border-sky-400/30 bg-sky-400/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-sky-300">
-              0 / 8
-            </span>
-          </div>
-          <div id="stack-list" class="mt-4 space-y-2.5">
-            <!-- Rendered dynamically -->
-          </div>
-        </div>
-
-        <!-- Right: Weekly Management & Bottleneck Guardrails -->
-        <div class="sleek-card rounded-2xl p-5 sm:p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-base font-bold text-white">Weekly Management &amp; Guardrails</h2>
-              <p class="text-xs text-slate-400">Operational checkpoints to prevent sprint bottlenecks.</p>
-            </div>
-            <span id="ops-guard-count" class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-emerald-300">
-              0 / 5
-            </span>
-          </div>
-          <div id="guardrails-list" class="mt-4 space-y-2.5">
-            <!-- Rendered dynamically -->
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================================================
-         PAGE 4: SOURCE CODE & EXPORTS
-         ========================================================= -->
-    <section id="page-source" class="page-view space-y-5">
-      <div class="sleek-card rounded-2xl p-5 sm:p-6">
-        <div class="flex flex-col justify-between gap-4 border-b border-slate-800 pb-4 sm:flex-row sm:items-center">
+    <!-- ==================== PAGE 3: MILESTONES & COSTS ==================== -->
+    <section id="page-milestones" class="page-view space-y-6">
+      <!-- 4 Payment Milestones -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
           <div>
-            <h2 class="text-lg font-bold text-white">Single-File Application Code &amp; Reports</h2>
-            <p class="text-xs text-slate-400">Self-contained HTML file — host anywhere or download executive progress reports.</p>
+            <h2 class="text-base font-bold text-white">Official Payment Milestones (₹3,80,000 Total)</h2>
+            <p class="text-xs text-slate-400">Toggle milestone clearance status as deliverables are signed off.</p>
           </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <button onclick="copyHtmlCode()" class="rounded-xl bg-sky-500 px-3.5 py-2 text-xs font-bold text-obsidian transition hover:bg-sky-400">
-              Copy HTML Code
-            </button>
-            <button onclick="downloadHtmlFile()" class="rounded-xl border border-indigo-400/40 bg-indigo-500/10 px-3.5 py-2 text-xs font-semibold text-indigo-300 transition hover:bg-indigo-500/20">
-              Download .HTML
-            </button>
-            <button onclick="exportTxtReport()" class="rounded-xl border border-slate-700 bg-panelLight px-3.5 py-2 text-xs font-semibold text-slate-200 transition hover:border-sky-400/40">
-              Export .TXT
-            </button>
-            <button onclick="exportWordReport()" class="rounded-xl border border-emerald-500/35 bg-emerald-500/10 px-3.5 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/20">
-              Export Word .DOC
-            </button>
+          <div id="milestone-paid-summary" class="text-xs font-mono px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">
+            Cleared: ₹0 / ₹3,80,000
+          </div>
+        </div>
+        <div id="milestones-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      </div>
+
+      <!-- Cost Breakdown Tables -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Development & Deployment Costs -->
+        <div class="glass-card rounded-2xl p-5">
+          <h3 class="text-sm font-bold text-white mb-3">Development & Store Deployment Breakdown</h3>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between py-1.5 border-b border-slate-800/80"><span class="text-slate-300">User App (Android + iOS)</span><span class="font-mono text-white">₹88,000</span></div>
+            <div class="flex justify-between py-1.5 border-b border-slate-800/80"><span class="text-slate-300">Driver App (Android + iOS)</span><span class="font-mono text-white">₹88,000</span></div>
+            <div class="flex justify-between py-1.5 border-b border-slate-800/80"><span class="text-slate-300">Admin Dashboard (Flutter Web)</span><span class="font-mono text-white">₹45,000</span></div>
+            <div class="flex justify-between py-1.5 border-b border-slate-800/80"><span class="text-slate-300">Backend (Firebase + Cloud Functions)</span><span class="font-mono text-white">₹40,000</span></div>
+            <div class="flex justify-between py-1.5 border-b border-slate-800/80"><span class="text-slate-300">UI/UX Design & Prototypes</span><span class="font-mono text-white">₹18,000</span></div>
+            <div class="flex justify-between py-1.5 border-b border-slate-800/80"><span class="text-slate-300">Testing & Real-Device QA</span><span class="font-mono text-white">₹16,000</span></div>
+            <div class="flex justify-between py-1.5 border-b border-slate-800/80"><span class="text-slate-300">Google Play + Apple Store + Publishing</span><span class="font-mono text-indigo-300">₹19,900</span></div>
+            <div class="flex justify-between pt-2 font-semibold text-cyan-400"><span>Subtotal (Build + Launch)</span><span class="font-mono">₹3,14,900</span></div>
           </div>
         </div>
 
-        <div class="mt-4">
-          <textarea
-            id="source-viewer"
-            readonly
-            aria-label="Complete Single-File HTML Source Code"
-            class="h-96 w-full rounded-xl border border-slate-800 bg-obsidian p-4 font-mono text-xs leading-relaxed text-sky-200 focus:outline-none"
-          ></textarea>
+        <!-- 12-Month Running & Maintenance Costs -->
+        <div class="glass-card rounded-2xl p-5">
+          <h3 class="text-sm font-bold text-white mb-3">12-Month Running Cost & Exclusions</h3>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between py-1.5 border-b border-slate-800/80"><span class="text-slate-300">Bug-Fix & OS Compliance Support (₹2,250/mo)</span><span class="font-mono text-white">₹27,000</span></div>
+            <div class="flex justify-between py-1.5 border-b border-slate-800/80"><span class="text-slate-300">Cloud VPS 2 vCPU / 4GB RAM (₹1,250/mo)</span><span class="font-mono text-white">₹15,000</span></div>
+            <div class="flex justify-between py-1.5 border-b border-slate-800/80"><span class="text-slate-300">Firebase Blaze Plan Est. (₹850/mo)</span><span class="font-mono text-white">₹10,200</span></div>
+            <div class="flex justify-between py-1.5 border-b border-slate-800/80"><span class="text-slate-300">DLT OTP SMS Gateway (₹600/mo)</span><span class="font-mono text-white">₹7,200</span></div>
+            <div class="flex justify-between py-1.5 border-b border-slate-800/80"><span class="text-slate-300">Annual Domain Name + Contingency Buffer</span><span class="font-mono text-white">₹5,700</span></div>
+            <div class="flex justify-between pt-2 font-semibold text-emerald-400"><span>Grand Total (All-Inclusive)</span><span class="font-mono">₹3,80,000</span></div>
+          </div>
+          <div class="mt-4 p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-[11px] text-slate-400 space-y-1">
+            <p><strong class="text-slate-200">Usage Notes:</strong> Google Maps API billed directly by Google based on usage; Razorpay deducts ~2% per online transaction.</p>
+            <p><strong class="text-slate-200">V2 Exclusions:</strong> Scheduled rides, promo coupons, corporate accounts, in-app chat/call, and multi-language can be quoted post-launch.</p>
+          </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ==================== PAGE 4: SOURCE CODE & EXPORTS ==================== -->
+    <section id="page-code" class="page-view space-y-5">
+      <div class="glass-card rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-base font-bold text-white">Export Reports & Standalone Source Code</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Download progress reports for client reviews or save this single-file app locally.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="exportTXT()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition">
+            Download .TXT Report
+          </button>
+          <button onclick="exportDOC()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition">
+            Download Word (.DOC)
+          </button>
+          <button onclick="downloadHTML()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition">
+            Download .HTML App
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-mono text-cyan-400">ingine_taxi_tracker.html (Single-File Source)</span>
+          <button onclick="copySourceCode()" id="copy-btn" class="px-3 py-1 rounded-lg text-xs font-medium bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 transition">
+            Copy Code
+          </button>
+        </div>
+        <pre id="source-viewer" class="bg-[#04070D] border border-slate-800/90 rounded-xl p-4 text-[11px] font-mono text-slate-300 overflow-x-auto max-h-[420px] leading-relaxed"></pre>
       </div>
     </section>
 
   </main>
 
-  <!-- Add Task Modal -->
-  <div id="add-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
-    <div class="w-full max-w-md rounded-2xl border border-slate-700 bg-panel p-6 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-base font-bold text-white">Add New Task</h3>
-        <button onclick="closeModal('add-modal')" class="text-slate-400 hover:text-white">&times;</button>
-      </div>
-      <form onsubmit="createNewTask(event)" class="mt-4 space-y-3.5">
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block font-mono text-[11px] uppercase text-slate-400">Phase</label>
-            <select id="in-phase" class="mt-1 w-full rounded-xl border border-slate-700 bg-obsidian px-3 py-2 text-xs text-white focus:border-sky-400 focus:outline-none">
-              <option value="1">Phase 1 (Wks 1-2)</option>
-              <option value="2">Phase 2 (Wks 3-5)</option>
-              <option value="3">Phase 3 (Wks 6-10)</option>
-              <option value="4">Phase 4 (Wks 11-13)</option>
-              <option value="5">Phase 5 (Wks 14-15)</option>
-              <option value="6">Phase 6 (Wk 16+)</option>
-            </select>
-          </div>
-          <div>
-            <label class="block font-mono text-[11px] uppercase text-slate-400">Track</label>
-            <select id="in-track" class="mt-1 w-full rounded-xl border border-slate-700 bg-obsidian px-3 py-2 text-xs text-white focus:border-sky-400 focus:outline-none">
-              <option value="Rider App">Rider App</option>
-              <option value="Driver App">Driver App</option>
-              <option value="Backend">Backend</option>
-              <option value="Admin">Admin</option>
-              <option value="QA/Ops">QA/Ops</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <label class="block font-mono text-[11px] uppercase text-slate-400">Task Title</label>
-          <input id="in-title" type="text" required placeholder="e.g., Corporate Wallet Integration" class="mt-1 w-full rounded-xl border border-slate-700 bg-obsidian px-3 py-2 text-xs text-white focus:border-sky-400 focus:outline-none" />
-        </div>
-        <div>
-          <label class="block font-mono text-[11px] uppercase text-slate-400">1-Line Deliverable Summary</label>
-          <input id="in-summary" type="text" required placeholder="Concise scope of work..." class="mt-1 w-full rounded-xl border border-slate-700 bg-obsidian px-3 py-2 text-xs text-white focus:border-sky-400 focus:outline-none" />
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block font-mono text-[11px] uppercase text-slate-400">Assignee</label>
-            <input id="in-assignee" type="text" placeholder="Developer name" class="mt-1 w-full rounded-xl border border-slate-700 bg-obsidian px-3 py-2 text-xs text-white focus:border-sky-400 focus:outline-none" />
-          </div>
-          <div>
-            <label class="block font-mono text-[11px] uppercase text-slate-400">Target Date</label>
-            <input id="in-date" type="date" class="mt-1 w-full rounded-xl border border-slate-700 bg-obsidian px-3 py-2 text-xs text-white focus:border-sky-400 focus:outline-none" />
-          </div>
-        </div>
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeModal('add-modal')" class="rounded-xl border border-slate-700 px-3.5 py-2 text-xs text-slate-300 hover:bg-slate-800">Cancel</button>
-          <button type="submit" class="rounded-xl bg-sky-500 px-4 py-2 text-xs font-bold text-obsidian hover:bg-sky-400">Add Task</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Reset Confirmation Modal -->
-  <div id="reset-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
-    <div class="w-full max-w-sm rounded-2xl border border-rose-500/35 bg-panel p-6 shadow-2xl">
-      <h3 class="text-base font-bold text-white">Reset All Progress?</h3>
-      <p class="mt-2 text-xs leading-relaxed text-slate-400">
-        This will restore default roadmap tasks, clear assignees and dates, and reset tech stack &amp; guardrail toggles.
-      </p>
-      <div class="mt-5 flex justify-end gap-2">
-        <button onclick="closeModal('reset-modal')" class="rounded-xl border border-slate-700 px-3.5 py-2 text-xs text-slate-300 hover:bg-slate-800">Cancel</button>
-        <button onclick="confirmReset()" class="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-500">Reset Data</button>
-      </div>
-    </div>
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 border border-cyan-500/40 text-xs font-medium text-cyan-200 shadow-2xl">
+    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+    <span id="toast-msg">Saved</span>
   </div>
 
   <script>
-    const STORAGE_KEY = 'uber_tracker_compact_spa_v1';
+    const STORAGE_KEY = 'ingine_taxi_tracker_v1';
 
-    const PHASES = [
-      { id: 1, short: 'Phase 1', title: 'Discovery & UI/UX', weeks: 'Wks 1–2', focus: 'Pricing rules, DB schemas, API contracts & Figma prototypes' },
-      { id: 2, short: 'Phase 2', title: 'Backend & Real-Time Engine', weeks: 'Wks 3–5', focus: 'OTP Auth, Redis Geo-Indexing, WebSocket GPS & Ride Matching' },
-      { id: 3, short: 'Phase 3', title: 'MVP Apps & Admin', weeks: 'Wks 6–10', focus: 'Rider App, Driver App & Web Admin Fleet Control Panel' },
-      { id: 4, short: 'Phase 4', title: 'Payments, Comms & Safety', weeks: 'Wks 11–13', focus: 'UPI/Card settlements, masked calls, 4-digit PIN & SOS' },
-      { id: 5, short: 'Phase 5', title: 'Field Testing & QA', weeks: 'Wks 14–15', focus: 'Road GPS battery testing, edge-case QA & WebSocket load tests' },
-      { id: 6, short: 'Phase 6', title: 'Launch & V2 Scaling', weeks: 'Wk 16+', focus: 'Cloud auto-scaling, 50–100 driver onboarding & V2 features' }
-    ];
+    const DEFAULT_DATA = {
+      activePhase: 'P1',
+      phases: [
+        {
+          id: 'P1',
+          short: 'Phase 1',
+          title: 'Kickoff, Store Accounts & UI/UX',
+          weeks: 'Weeks 1–2',
+          milestone: 'Milestone 1 (₹1,14,000)',
+          summary: 'Developer store accounts, domain setup, Firestore architecture, and complete app/admin UI prototypes.'
+        },
+        {
+          id: 'P2',
+          short: 'Phase 2',
+          title: 'Backend Core & Daily Fee Engine',
+          weeks: 'Weeks 2–3',
+          milestone: 'Milestone 2 (₹95,000)',
+          summary: 'Nearby driver matching, ride state flow, DLT OTP auth, and Razorpay 24-hour driver fee validation.'
+        },
+        {
+          id: 'P3',
+          short: 'Phase 3',
+          title: 'User App & Driver App MVP',
+          weeks: 'Weeks 3–5',
+          milestone: 'Milestone 3 (₹95,000)',
+          summary: 'Cross-platform Flutter Rider & Driver apps for Bike, Auto, and Cab with live tracking and payments.'
+        },
+        {
+          id: 'P4',
+          short: 'Phase 4',
+          title: 'Flutter Web Admin & Device QA',
+          weeks: 'Weeks 5–6',
+          milestone: 'Milestone 3 (Test Build)',
+          summary: 'Web admin panel for KYC & daily fee monitoring plus real Android/iOS GPS stress testing.'
+        },
+        {
+          id: 'P5',
+          short: 'Phase 5',
+          title: 'Cloud Deployment & Store Go-Live',
+          weeks: 'Weeks 7–8',
+          milestone: 'Milestone 4 (₹76,000)',
+          summary: 'Production VPS/Firebase launch, Play Store & App Store approvals, code handover, and 12-mo support.'
+        }
+      ],
+      tasks: [
+        // Phase 1
+        { id: 'T1', phase: 'P1', track: 'Accounts', cost: '₹12,500', title: 'Google Play, Apple Developer & Domain Setup', desc: 'Register Play Store (₹2,200), Apple Developer (₹8,700) in client name + annual domain (₹1,600).', assignee: '', due: 'Week 1', status: 'Pending' },
+        { id: 'T2', phase: 'P1', track: 'UI/UX', cost: '₹18,000', title: 'Rider, Driver & Admin UI/UX Prototypes', desc: 'Design complete screens, interactive prototypes, app icon, and splash screen.', assignee: '', due: 'Week 2', status: 'Pending' },
+        { id: 'T3', phase: 'P1', track: 'Backend', cost: 'Included', title: 'Firestore Schema & Security Rules Blueprint', desc: 'Structure collections for Users, Drivers, Bike/Auto/Cab tiers, Rides, and Daily Fee passes.', assignee: '', due: 'Week 2', status: 'Pending' },
 
-    const TRACKS = ['All', 'Rider App', 'Driver App', 'Backend', 'Admin', 'QA/Ops'];
+        // Phase 2
+        { id: 'T4', phase: 'P2', track: 'Backend', cost: '₹40,000', title: 'Nearby Driver Matching & Ride State Machine', desc: 'Cloud Functions + real-time geo-matching and ride lifecycle transitions.', assignee: '', due: 'Week 3', status: 'Pending' },
+        { id: 'T5', phase: 'P2', track: 'Backend', cost: 'Included', title: 'Fixed Daily Driver Fee Gatekeeper (Razorpay)', desc: 'Verify daily Razorpay fee payment and automatically activate/expire 24h driver ride access.', assignee: '', due: 'Week 3', status: 'Pending' },
+        { id: 'T6', phase: 'P2', track: 'Backend', cost: 'Included', title: 'DLT OTP Login & Core Booking Flow Demo', desc: 'Integrate DLT SMS OTP auth, FCM push alerts, and end-to-end user-books/driver-accepts demo.', assignee: '', due: 'Week 3', status: 'Pending' },
 
-    const INITIAL_TASKS = [
-      // Phase 1
-      { id: '1.1', phase: 1, track: 'Backend', title: 'Business Logic & Pricing Rules', summary: 'Define vehicle tiers, base fares, per-km/min rates, cancellation & commission %.', assignee: '', dueDate: '', status: 'Pending' },
-      { id: '1.2', phase: 1, track: 'Backend', title: 'Database & API Blueprint', summary: 'Design PostgreSQL schema (Users, Drivers, Trips, Ledger) & REST/WS contracts.', assignee: '', dueDate: '', status: 'Pending' },
-      { id: '1.3', phase: 1, track: 'Rider App', title: 'Rider, Driver & Admin Figma Prototypes', summary: 'Clickable UI flows for booking, driver dispatch alerts & admin approval queue.', assignee: '', dueDate: '', status: 'Pending' },
+        // Phase 3
+        { id: 'T7', phase: 'P3', track: 'User App', cost: '₹88,000', title: 'User App: Map Pickup/Drop & Fare Estimator', desc: 'OTP login, Google Maps pickup/drop selector, Bike/Auto/Cab categories, and upfront fare calculation.', assignee: '', due: 'Week 4', status: 'Pending' },
+        { id: 'T8', phase: 'P3', track: 'User App', cost: 'Included', title: 'User App: Live Tracking, Payments & History', desc: 'Driver assignment, real-time GPS tracking, cancellation, Cash/UPI/Razorpay payment, ratings & profile.', assignee: '', due: 'Week 5', status: 'Pending' },
+        { id: 'T9', phase: 'P3', track: 'Driver App', cost: '₹88,000', title: 'Driver App: KYC Onboarding & Daily Fee Screen', desc: 'Registration, OTP login, document upload, verification status, and Razorpay daily fee payment.', assignee: '', due: 'Week 4', status: 'Pending' },
+        { id: 'T10', phase: 'P3', track: 'Driver App', cost: 'Included', title: 'Driver App: Online Toggle, Dispatch & Earnings', desc: 'Online/offline switch, ride request alerts (accept/reject), navigation, ride completion & payout history.', assignee: '', due: 'Week 5', status: 'Pending' },
 
-      // Phase 2
-      { id: '2.1', phase: 2, track: 'Backend', title: 'OTP Auth & JWT Roles', summary: 'Phone OTP verification with role-based permissions for Rider, Driver & Admin.', assignee: '', dueDate: '', status: 'Pending' },
-      { id: '2.2', phase: 2, track: 'Backend', title: 'Live GPS WebSockets & Redis Geo-Indexing', summary: 'Ingest 3–5s driver GPS pings into Redis for sub-second 2–5 km radius queries.', assignee: '', dueDate: '', status: 'Pending' },
-      { id: '2.3', phase: 2, track: 'Backend', title: 'Ride-Matching & Trip State Machine', summary: 'Enforce strict trip transitions: Requested -> Accepted -> Arrived -> Active -> Done.', assignee: '', dueDate: '', status: 'Pending' },
-      { id: '2.4', phase: 2, track: 'Backend', title: 'Upfront Fare & Distance Matrix Engine', summary: 'Compute upfront trip estimates, ETAs & dynamic surge multipliers via Maps API.', assignee: '', dueDate: '', status: 'Pending' },
+        // Phase 4
+        { id: 'T11', phase: 'P4', track: 'Admin Web', cost: '₹45,000', title: 'Flutter Web Admin: KYC & Pricing Controls', desc: 'Admin login, driver document approval, user/ride management, and Bike/Auto/Cab base & per-km rates.', assignee: '', due: 'Week 6', status: 'Pending' },
+        { id: 'T12', phase: 'P4', track: 'Admin Web', cost: 'Included', title: 'Flutter Web Admin: Daily Fee Monitor & Reports', desc: 'Configure daily driver fee amount, monitor daily Razorpay collections, complaints & financial reports.', assignee: '', due: 'Week 6', status: 'Pending' },
+        { id: 'T13', phase: 'P4', track: 'QA Testing', cost: '₹16,000', title: 'Real-Device Android/iOS & GPS Stress Testing', desc: 'End-to-end field testing on physical devices, background GPS checks, and pre-launch bug fixes.', assignee: '', due: 'Week 6', status: 'Pending' },
 
-      // Phase 3
-      { id: '3.1', phase: 3, track: 'Rider App', title: 'Rider Map, Tiers & Live Tracking', summary: 'Autocomplete pickup/drop, upfront tier fares, live vehicle markers & route polyline.', assignee: '', dueDate: '', status: 'Pending' },
-      { id: '3.2', phase: 3, track: 'Driver App', title: 'Driver KYC Upload & 15s Request Pop-up', summary: 'License/RC/ID upload, Online toggle & 15-second incoming ride accept/reject alert.', assignee: '', dueDate: '', status: 'Pending' },
-      { id: '3.3', phase: 3, track: 'Driver App', title: 'Driver Turn-by-Turn Navigation & Earnings', summary: 'In-app routing, swipeable trip status slider & daily/weekly earnings summary.', assignee: '', dueDate: '', status: 'Pending' },
-      { id: '3.4', phase: 3, track: 'Admin', title: 'Admin KYC Approval, Fleet Map & Fare Controls', summary: 'Verify driver documents, monitor live active rides & configure surge/commission rates.', assignee: '', dueDate: '', status: 'Pending' },
+        // Phase 5 (Deployment & Making Live)
+        { id: 'T14', phase: 'P5', track: 'Cloud Ops', cost: '₹25,200/yr', title: 'Production VPS (2vCPU/4GB) & Firebase Blaze Live', desc: 'Deploy Node.js matching APIs & Flutter Web Admin with SSL, backups, and live Razorpay/Maps keys.', assignee: '', due: 'Week 7', status: 'Pending' },
+        { id: 'T15', phase: 'P5', track: 'Store Launch', cost: '₹9,000', title: 'Play Store & App Store Submission (4 Listings)', desc: 'Upload User & Driver builds with graphics, screenshots, privacy policy & resolve store review feedback.', assignee: '', due: 'Week 8', status: 'Pending' },
+        { id: 'T16', phase: 'P5', track: 'Handover', cost: '₹27,000/yr', title: 'Full Source Code Handover & 12-Mo Support Start', desc: 'Transfer Git repositories, store ownership, and activate 12-month bug-fix & OS compliance support.', assignee: '', due: 'Week 8', status: 'Pending' }
+      ],
+      milestones: [
+        { id: 'M1', name: '1. Project Start (30%)', week: 'Week 0', amount: 114000, deliverable: 'Advance, Google/Apple store accounts set up, UI design begins', paid: false },
+        { id: 'M2', name: '2. Design + Core Flow (25%)', week: 'Week 3', amount: 95000, deliverable: 'Approved UI designs, working booking flow demo (user books, driver accepts)', paid: false },
+        { id: 'M3', name: '3. Test Build (25%)', week: 'Week 6', amount: 95000, deliverable: 'Full Android + iOS test apps and Flutter Web admin panel for client testing', paid: false },
+        { id: 'M4', name: '4. Go Live (20%)', week: 'Week 8', amount: 76000, deliverable: 'Apps published on Play Store & App Store, source code handover, 12-mo support starts', paid: false }
+      ]
+    };
 
-      // Phase 4
-      { id: '4.1', phase: 4, track: 'Backend', title: 'Payment Gateway, UPI & Automated Driver Payouts', summary: 'Support UPI, cards, wallets, cash tracking & automated commission split settlements.', assignee: '', dueDate: '', status: 'Pending' },
-      { id: '4.2', phase: 4, track: 'Rider App', title: 'Masked Calling & In-App Chat', summary: 'Anonymized VoIP/number-masked calling & quick-preset chat hiding personal numbers.', assignee: '', dueDate: '', status: 'Pending' },
-      { id: '4.3', phase: 4, track: 'Rider App', title: '4-Digit Ride PIN, Live Trip Share, SOS & Ratings', summary: 'Start-trip OTP verification, trusted-contact live link, emergency SOS & 5-star reviews.', assignee: '', dueDate: '', status: 'Pending' },
-
-      // Phase 5
-      { id: '5.1', phase: 5, track: 'QA/Ops', title: 'Real-World Road & Background GPS Battery Testing', summary: 'Field drive tests in low-network zones & OS battery optimization immunity checks.', assignee: '', dueDate: '', status: 'Pending' },
-      { id: '5.2', phase: 5, track: 'QA/Ops', title: 'Mid-Trip Cancellations & Payment Edge-Case QA', summary: 'Test concurrent ride locks, failed UPI webhooks, mid-trip cancellations & surge rules.', assignee: '', dueDate: '', status: 'Pending' },
-      { id: '5.3', phase: 5, track: 'QA/Ops', title: 'WebSocket Load & Concurrency Stress Test', summary: 'Benchmark server stability under thousands of simultaneous driver GPS pings.', assignee: '', dueDate: '', status: 'Pending' },
-
-      // Phase 6
-      { id: '6.1', phase: 6, track: 'QA/Ops', title: 'Cloud Auto-Scaling & App Store/Play Store Deployment', summary: 'Deploy AWS/GCP auto-scaling backend & publish Rider and Driver apps to stores.', assignee: '', dueDate: '', status: 'Pending' },
-      { id: '6.2', phase: 6, track: 'QA/Ops', title: 'Supply-First Onboarding (50–100 Drivers)', summary: 'Verify and activate 50–100 drivers in launch zone to keep wait times under 5 mins.', assignee: '', dueDate: '', status: 'Pending' },
-      { id: '6.3', phase: 6, track: 'Rider App', title: 'V2 Features (Scheduled Rides, Multi-Stop, Heatmaps, Courier)', summary: 'Roll out Reserve scheduling, multi-stop trips, driver surge heatmaps & parcel delivery.', assignee: '', dueDate: '', status: 'Pending' }
-    ];
-
-    const INITIAL_STACK = [
-      { id: 'st-1', name: 'Flutter Mobile Apps', detail: 'Single Android & iOS codebase for Rider & Driver', ready: false },
-      { id: 'st-2', name: 'Node.js / Go + WebSockets', detail: 'Real-time Socket.io event & GPS stream server', ready: false },
-      { id: 'st-3', name: 'PostgreSQL + PostGIS', detail: 'Relational trip ledger & spatial geofencing', ready: false },
-      { id: 'st-4', name: 'Redis Geo-Cache', detail: 'In-memory millisecond nearby-driver indexing', ready: false },
-      { id: 'st-5', name: 'React / Next.js Admin', detail: 'Web operations portal for KYC & live fleet map', ready: false },
-      { id: 'st-6', name: 'Google Maps SDK', detail: 'Places autocomplete, routing & Distance Matrix', ready: false },
-      { id: 'st-7', name: 'Firebase & Twilio / MSG91', detail: 'FCM push alerts, SMS OTP & masked VoIP calls', ready: false },
-      { id: 'st-8', name: 'Razorpay / Stripe', detail: 'UPI, cards, wallets & automated driver splits', ready: false }
-    ];
-
-    const INITIAL_GUARDRAILS = [
-      { id: 'gd-1', title: 'Kanban 1–2 Day Tickets', detail: 'Keep every developer ticket scoped to 1–2 days max.', active: false },
-      { id: 'gd-2', title: 'Friday Live Staging Booking Demo', detail: 'Run live Rider-to-Driver test ride every Friday.', active: false },
-      { id: 'gd-3', title: 'Google Maps API Billing Cap Alert', detail: 'Enable billing alerts & cache frequent route estimates.', active: false },
-      { id: 'gd-4', title: 'Driver Background GPS Battery Check', detail: 'Ensure background location service survives OS sleep.', active: false },
-      { id: 'gd-5', title: 'Pre-Launch Zone Liquidity Check', detail: 'Confirm 50+ active drivers online before rider promo.', active: false }
-    ];
-
-    let currentPage = 'overview';
-    let selectedPhase = 1; // 1..6 or 'all'
-    let selectedTrack = 'All';
     let state = loadState();
 
     function loadState() {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed && Array.isArray(parsed.tasks)) return parsed;
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return JSON.parse(JSON.stringify(DEFAULT_DATA));
+        const parsed = JSON.parse(raw);
+        if (!parsed.phases || !parsed.tasks || !parsed.milestones) {
+          return JSON.parse(JSON.stringify(DEFAULT_DATA));
         }
-      } catch (e) { /* fallback */ }
-      return {
-        tasks: JSON.parse(JSON.stringify(INITIAL_TASKS)),
-        stack: JSON.parse(JSON.stringify(INITIAL_STACK)),
-        guardrails: JSON.parse(JSON.stringify(INITIAL_GUARDRAILS))
-      };
+        return parsed;
+      } catch (e) {
+        return JSON.parse(JSON.stringify(DEFAULT_DATA));
+      }
     }
 
-    function saveState(toastMsg) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        if (toastMsg) showToast(toastMsg);
-      } catch (e) { /* ignore */ }
+    function saveState(msg = 'Progress saved') {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      renderAll();
+      showToast(msg);
     }
 
-    function showToast(msg) {
+    function showToast(text) {
       const el = document.getElementById('toast');
-      document.getElementById('toast-text').textContent = msg;
-      el.classList.remove('opacity-0', 'translate-y-2');
-      el.classList.add('opacity-100', 'translate-y-0');
+      document.getElementById('toast-msg').textContent = text;
+      el.classList.remove('hidden');
+      el.classList.add('flex');
       clearTimeout(window._toastTimer);
       window._toastTimer = setTimeout(() => {
-        el.classList.add('opacity-0', 'translate-y-2');
-        el.classList.remove('opacity-100', 'translate-y-0');
+        el.classList.add('hidden');
+        el.classList.remove('flex');
       }, 2200);
     }
 
-    function esc(str) {
-      return String(str || '')
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-    }
-
-    // Page Switching with Smooth Animation
     function switchPage(pageId) {
-      currentPage = pageId;
-      document.querySelectorAll('.page-view').forEach(sec => {
-        sec.classList.remove('active');
+      document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + pageId).classList.add('active');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.className = 'nav-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition-all border border-transparent';
       });
-      const target = document.getElementById(`page-${pageId}`);
-      if (target) {
-        void target.offsetWidth; // trigger reflow for clean animation replay
-        target.classList.add('active');
+      const activeBtn = document.getElementById('nav-' + pageId);
+      activeBtn.className = 'nav-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-cyan-500/15 text-cyan-300 border border-cyan-500/30';
+
+      if (pageId === 'code') {
+        document.getElementById('source-viewer').textContent = document.documentElement.outerHTML;
       }
-
-      document.querySelectorAll('.nav-tab').forEach(btn => {
-        const isActive = btn.dataset.nav === pageId;
-        btn.className = isActive
-          ? 'nav-tab rounded-lg bg-sky-500/15 text-sky-300 border border-sky-400/35 px-3.5 py-1.5 text-xs font-bold transition'
-          : 'nav-tab rounded-lg text-slate-400 hover:text-white border border-transparent px-3.5 py-1.5 text-xs font-semibold transition';
-      });
-
-      if (pageId === 'overview') renderOverviewPage();
-      if (pageId === 'roadmap') renderRoadmapPage();
-      if (pageId === 'ops') renderOpsPage();
-      if (pageId === 'source') renderSourcePage();
     }
 
-    function openPhaseInRoadmap(phaseVal) {
-      selectedPhase = phaseVal;
+    function openPhaseInRoadmap(phaseId) {
+      state.activePhase = phaseId;
+      saveState('Viewing ' + phaseId);
       switchPage('roadmap');
     }
 
-    // ==========================================
-    // RENDER PAGE 1: OVERVIEW
-    // ==========================================
-    function renderOverviewPage() {
-      const total = state.tasks.length;
-      const done = state.tasks.filter(t => t.status === 'Completed').length;
-      const active = state.tasks.filter(t => t.status === 'In Progress' || t.status === 'Testing').length;
-      const pct = total === 0 ? 0 : Math.round((done / total) * 100);
-
-      // Update Circular SVG Ring (circumference = 2 * pi * 26 = 163.36)
-      const circumference = 163.36;
-      const offset = circumference - (pct / 100) * circumference;
-      document.getElementById('kpi-ring').style.strokeDashoffset = offset;
-      document.getElementById('kpi-ring-text').textContent = `${pct}%`;
-      document.getElementById('kpi-ring-sub').textContent = `${done} of ${total} Tasks`;
-
-      document.getElementById('kpi-done').textContent = done;
-      document.getElementById('kpi-active').textContent = active;
-
-      // Active Phase Status
-      let activePhase = PHASES[PHASES.length - 1];
-      for (const p of PHASES) {
-        const pTasks = state.tasks.filter(t => t.phase === p.id);
-        if (pTasks.some(t => t.status !== 'Completed')) {
-          activePhase = p;
-          break;
-        }
-      }
-      document.getElementById('kpi-launch-status').textContent =
-        pct === 100 ? 'Ready for Full Launch!' : `${activePhase.short}: ${activePhase.title}`;
-
-      const stackReady = state.stack.filter(s => s.ready).length;
-      document.getElementById('kpi-stack-badge').textContent = `Stack: ${stackReady}/${state.stack.length} Ready`;
-
-      // Render 6-Phase Cards Grid
-      const grid = document.getElementById('overview-phases-grid');
-      grid.innerHTML = PHASES.map(p => {
-        const pTasks = state.tasks.filter(t => t.phase === p.id);
-        const pDone = pTasks.filter(t => t.status === 'Completed').length;
-        const pPct = pTasks.length === 0 ? 0 : Math.round((pDone / pTasks.length) * 100);
-        const isComplete = pPct === 100 && pTasks.length > 0;
-
-        return `
-          <div onclick="openPhaseInRoadmap(${p.id})" class="sleek-card phase-card-hover cursor-pointer rounded-2xl p-5 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between">
-                <span class="rounded-md border border-sky-400/30 bg-sky-400/10 px-2 py-0.5 font-mono text-[11px] font-bold text-sky-300">
-                  ${p.short} • ${p.weeks}
-                </span>
-                <span class="font-mono text-xs font-bold ${isComplete ? 'text-emerald-400' : 'text-slate-300'}">
-                  ${pDone}/${pTasks.length}
-                </span>
-              </div>
-              <h3 class="mt-2.5 text-sm font-bold text-white">${p.title}</h3>
-              <p class="mt-1 text-xs leading-relaxed text-slate-400">${p.focus}</p>
-            </div>
-
-            <div class="mt-4">
-              <div class="flex items-center justify-between font-mono text-[11px] mb-1.5">
-                <span class="text-slate-400">Progress</span>
-                <span class="${isComplete ? 'text-emerald-400' : 'text-sky-400'} font-bold">${pPct}%</span>
-              </div>
-              <div class="h-1.5 w-full overflow-hidden rounded-full bg-obsidian">
-                <div class="h-full rounded-full transition-all duration-500 ${isComplete ? 'bg-emerald-400' : 'bg-gradient-to-r from-sky-400 to-indigo-400'}" style="width: ${pPct}%"></div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
+    function selectPhaseFilter(phaseId) {
+      state.activePhase = phaseId;
+      saveState('Switched phase view');
     }
 
-    // ==========================================
-    // RENDER PAGE 2: ROADMAP
-    // ==========================================
-    function renderRoadmapPage() {
-      // Phase Selector Pills
-      const phasePills = document.getElementById('phase-pills');
-      const pillItems = [
-        ...PHASES.map(p => ({ val: p.id, label: p.short })),
-        { val: 'all', label: 'All Phases' }
-      ];
-      phasePills.innerHTML = pillItems.map(item => {
-        const active = selectedPhase === item.val;
+    function updateTask(id, field, value) {
+      const task = state.tasks.find(t => t.id === id);
+      if (task) {
+        task[field] = value;
+        saveState('Updated ' + id);
+      }
+    }
+
+    function toggleMilestone(id) {
+      const m = state.milestones.find(x => x.id === id);
+      if (m) {
+        m.paid = !m.paid;
+        saveState(m.paid ? 'Milestone marked cleared' : 'Milestone marked pending');
+      }
+    }
+
+    function resetAllData() {
+      if (confirm('Reset all developer assignments, task statuses, and milestone flags to default?')) {
+        state = JSON.parse(JSON.stringify(DEFAULT_DATA));
+        saveState('Tracker reset to default');
+      }
+    }
+
+    function getStatusBadge(status) {
+      switch (status) {
+        case 'Completed': return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+        case 'In Progress': return 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30';
+        case 'Testing': return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+        default: return 'bg-slate-800 text-slate-400 border-slate-700';
+      }
+    }
+
+    function renderAll() {
+      // Overall stats
+      const total = state.tasks.length;
+      const done = state.tasks.filter(t => t.status === 'Completed').length;
+      const pct = total ? Math.round((done / total) * 100) : 0;
+
+      document.getElementById('overall-pct').textContent = pct + '%';
+      document.getElementById('overall-counts').textContent = `${done} of ${total} deliverables completed`;
+      const circumference = 251.2;
+      document.getElementById('overall-ring').style.strokeDashoffset = circumference - (pct / 100) * circumference;
+
+      // Overview Phase Cards
+      const grid = document.getElementById('overview-phase-grid');
+      grid.innerHTML = state.phases.map(p => {
+        const pTasks = state.tasks.filter(t => t.phase === p.id);
+        const pDone = pTasks.filter(t => t.status === 'Completed').length;
+        const pPct = pTasks.length ? Math.round((pDone / pTasks.length) * 100) : 0;
+        const isLivePhase = p.id === 'P5';
         return `
-          <button
-            onclick="selectPhase(${typeof item.val === 'number' ? item.val : `'${item.val}'`})"
-            class="rounded-xl border px-3 py-1.5 text-xs font-semibold transition ${
-              active
-                ? 'border-sky-400 bg-sky-400/20 text-sky-200'
-                : 'border-slate-800 bg-panel text-slate-400 hover:border-slate-600 hover:text-white'
-            }"
-          >
-            ${item.label}
-          </button>
+          <div onclick="openPhaseInRoadmap('${p.id}')" class="glass-card clickable-card cursor-pointer rounded-2xl p-4 flex flex-col justify-between ${isLivePhase ? 'border-cyan-500/35' : ''}">
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">${p.short} • ${p.weeks}</span>
+                <span class="text-xs font-mono font-semibold ${pPct === 100 ? 'text-emerald-400' : 'text-slate-300'}">${pPct}%</span>
+              </div>
+              <h3 class="text-sm font-bold text-white mt-2.5">${p.title}</h3>
+              <p class="text-xs text-slate-400 mt-1 line-clamp-2">${p.summary}</p>
+            </div>
+            <div class="mt-4">
+              <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+                <span>${p.milestone}</span>
+                <span>${pDone}/${pTasks.length} tasks</span>
+              </div>
+              <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-cyan-400 to-indigo-500 transition-all duration-500" style="width: ${pPct}%"></div>
+              </div>
+            </div>
+          </div>
         `;
       }).join('');
 
-      // Track Filter Pills
-      const trackPills = document.getElementById('track-pills');
-      trackPills.innerHTML = TRACKS.map(tr => {
-        const active = selectedTrack === tr;
+      // Roadmap Phase Filter Pills
+      const filterBar = document.getElementById('phase-filter-bar');
+      const allPills = [{ id: 'ALL', short: 'All (16)' }, ...state.phases.map(p => ({ id: p.id, short: p.short }))];
+      filterBar.innerHTML = allPills.map(pill => {
+        const active = state.activePhase === pill.id;
         return `
-          <button
-            onclick="selectTrack('${tr}')"
-            class="rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition ${
-              active
-                ? 'border-indigo-400 bg-indigo-500/20 text-indigo-200'
-                : 'border-slate-800 bg-obsidian/70 text-slate-400 hover:text-slate-200'
-            }"
-          >
-            ${tr}
-          </button>
+          <button onclick="selectPhaseFilter('${pill.id}')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+            active
+              ? 'bg-cyan-500 text-slate-950 font-semibold shadow-md shadow-cyan-500/20'
+              : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+          }">${pill.short}</button>
         `;
       }).join('');
 
-      // Phase Banner
-      const banner = document.getElementById('phase-banner');
-      if (selectedPhase === 'all') {
-        const done = state.tasks.filter(t => t.status === 'Completed').length;
+      // Active Phase Banner
+      const banner = document.getElementById('active-phase-banner');
+      if (state.activePhase === 'ALL') {
         banner.innerHTML = `
           <div>
-            <span class="font-mono text-[11px] font-bold uppercase text-sky-400">Complete Roadmap View</span>
-            <h2 class="text-base font-extrabold text-white">All 6 Engineering Phases</h2>
-            <p class="text-xs text-slate-400">Viewing all tasks across the entire build lifecycle.</p>
+            <span class="text-[11px] font-mono text-cyan-400">COMPLETE 8-WEEK SCHEDULE</span>
+            <h3 class="text-sm font-bold text-white">All 5 Phases • Full MVP & Store Launch</h3>
           </div>
-          <span class="font-mono text-sm font-bold text-emerald-400">${done} / ${state.tasks.length} Completed</span>
+          <span class="text-xs font-mono text-slate-300">${done}/${total} Completed (${pct}%)</span>
         `;
       } else {
-        const pObj = PHASES.find(p => p.id === selectedPhase);
-        const pTasks = state.tasks.filter(t => t.phase === pObj.id);
-        const pDone = pTasks.filter(t => t.status === 'Completed').length;
-        const pPct = pTasks.length === 0 ? 0 : Math.round((pDone / pTasks.length) * 100);
+        const cur = state.phases.find(p => p.id === state.activePhase);
+        const curTasks = state.tasks.filter(t => t.phase === cur.id);
+        const curDone = curTasks.filter(t => t.status === 'Completed').length;
         banner.innerHTML = `
           <div>
-            <span class="font-mono text-[11px] font-bold uppercase text-sky-400">${pObj.short} • ${pObj.weeks}</span>
-            <h2 class="text-base font-extrabold text-white">${pObj.title}</h2>
-            <p class="text-xs text-slate-400">${pObj.focus}</p>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="font-mono text-xs text-slate-300">${pDone}/${pTasks.length} Done (${pPct}%)</span>
-            <div class="h-2 w-24 overflow-hidden rounded-full bg-obsidian">
-              <div class="h-full rounded-full bg-sky-400 transition-all duration-300" style="width: ${pPct}%"></div>
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] font-mono text-cyan-400">${cur.short} (${cur.weeks})</span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300">${cur.milestone}</span>
             </div>
+            <h3 class="text-sm font-bold text-white mt-1">${cur.title}</h3>
+            <p class="text-xs text-slate-400 mt-0.5">${cur.summary}</p>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <span class="text-sm font-mono font-bold text-cyan-400">${curDone}/${curTasks.length}</span>
+            <span class="block text-[10px] text-slate-400">Tasks Done</span>
           </div>
         `;
       }
 
-      // Filter Tasks
-      const query = document.getElementById('task-search').value.trim().toLowerCase();
-      const filtered = state.tasks.filter(t => {
-        const matchPhase = selectedPhase === 'all' || t.phase === selectedPhase;
-        const matchTrack = selectedTrack === 'All' || t.track === selectedTrack;
-        const matchQuery = !query ||
-          t.title.toLowerCase().includes(query) ||
-          t.summary.toLowerCase().includes(query) ||
-          (t.assignee && t.assignee.toLowerCase().includes(query));
-        return matchPhase && matchTrack && matchQuery;
-      });
+      // Filtered Task List
+      const visibleTasks = state.activePhase === 'ALL'
+        ? state.tasks
+        : state.tasks.filter(t => t.phase === state.activePhase);
 
-      const list = document.getElementById('tasks-list');
-      if (filtered.length === 0) {
-        list.innerHTML = `
-          <div class="sleek-card rounded-2xl p-10 text-center">
-            <p class="text-sm font-semibold text-slate-300">No tasks match the current filter.</p>
-            <p class="mt-1 text-xs text-slate-500">Try clearing your search or switching track filters.</p>
-          </div>
-        `;
-        return;
-      }
-
-      list.innerHTML = filtered.map(t => `
-        <div class="sleek-card rounded-2xl p-4 flex flex-col gap-3.5 lg:flex-row lg:items-center lg:justify-between ${t.status === 'Completed' ? 'opacity-80' : ''}">
-          <!-- Left: Checkbox + Track + Title + 1-line Summary -->
-          <div class="flex items-start gap-3">
-            <button
-              onclick="toggleTaskDone('${t.id}')"
-              aria-label="Toggle completed"
-              class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition ${
-                t.status === 'Completed'
-                  ? 'border-emerald-400 bg-emerald-400 text-obsidian'
-                  : 'border-slate-600 bg-obsidian hover:border-sky-400'
-              }"
-            >
-              ${t.status === 'Completed' ? '<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
-            </button>
-            <div>
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="font-mono text-[11px] font-bold text-sky-400">#${t.id}</span>
-                <span class="rounded-md border px-2 py-0.5 font-mono text-[10px] font-semibold ${trackBadgeClass(t.track)}">${t.track}</span>
-                <h3 class="text-sm font-bold ${t.status === 'Completed' ? 'line-through text-slate-400' : 'text-white'}">${t.title}</h3>
-              </div>
-              <p class="mt-0.5 text-xs text-slate-400">${t.summary}</p>
+      const listEl = document.getElementById('roadmap-task-list');
+      listEl.innerHTML = visibleTasks.map(t => `
+        <div class="glass-card rounded-xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="space-y-1 max-w-2xl">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-cyan-300 border border-slate-700">${t.phase} • ${t.track}</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">${t.cost}</span>
+              <span class="text-xs font-semibold text-white">${t.title}</span>
             </div>
+            <p class="text-xs text-slate-400 leading-relaxed">${t.desc}</p>
           </div>
 
-          <!-- Right: Inline Assignee, Date & Status -->
-          <div class="flex flex-wrap items-center gap-2 pl-8 lg:pl-0 shrink-0">
+          <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 flex-shrink-0">
             <input
               type="text"
-              value="${esc(t.assignee)}"
-              onchange="updateTaskField('${t.id}', 'assignee', this.value)"
-              placeholder="Assignee..."
-              class="w-32 rounded-xl border border-slate-700/80 bg-obsidian/90 px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
+              value="${t.assignee}"
+              placeholder="Assign dev..."
+              onchange="updateTask('${t.id}', 'assignee', this.value)"
+              class="w-32 px-2.5 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
             />
             <input
-              type="date"
-              value="${t.dueDate || ''}"
-              onchange="updateTaskField('${t.id}', 'dueDate', this.value)"
-              class="rounded-xl border border-slate-700/80 bg-obsidian/90 px-2.5 py-1.5 font-mono text-[11px] text-slate-300 focus:border-sky-400 focus:outline-none"
+              type="text"
+              value="${t.due}"
+              onchange="updateTask('${t.id}', 'due', this.value)"
+              class="w-20 px-2.5 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 text-xs font-mono text-slate-300 text-center focus:outline-none focus:border-cyan-500"
             />
             <select
-              onchange="updateTaskField('${t.id}', 'status', this.value)"
-              class="rounded-xl border px-2.5 py-1.5 text-xs font-bold focus:outline-none ${statusSelectClass(t.status)}"
+              onchange="updateTask('${t.id}', 'status', this.value)"
+              class="px-2.5 py-1.5 rounded-lg border text-xs font-medium focus:outline-none cursor-pointer ${getStatusBadge(t.status)}"
             >
-              <option value="Pending" class="bg-slate-900 text-slate-200" ${t.status === 'Pending' ? 'selected' : ''}>Pending</option>
-              <option value="In Progress" class="bg-slate-900 text-sky-300" ${t.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-              <option value="Testing" class="bg-slate-900 text-indigo-300" ${t.status === 'Testing' ? 'selected' : ''}>Testing</option>
-              <option value="Completed" class="bg-slate-900 text-emerald-300" ${t.status === 'Completed' ? 'selected' : ''}>Completed</option>
+              <option value="Pending" ${t.status === 'Pending' ? 'selected' : ''}>Pending</option>
+              <option value="In Progress" ${t.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+              <option value="Testing" ${t.status === 'Testing' ? 'selected' : ''}>Testing</option>
+              <option value="Completed" ${t.status === 'Completed' ? 'selected' : ''}>Completed</option>
             </select>
           </div>
         </div>
       `).join('');
-    }
 
-    function trackBadgeClass(track) {
-      const map = {
-        'Rider App': 'border-sky-400/35 bg-sky-400/10 text-sky-300',
-        'Driver App': 'border-emerald-400/35 bg-emerald-400/10 text-emerald-300',
-        'Backend': 'border-indigo-400/35 bg-indigo-400/10 text-indigo-300',
-        'Admin': 'border-purple-400/35 bg-purple-400/10 text-purple-300',
-        'QA/Ops': 'border-amber-400/35 bg-amber-400/10 text-amber-300'
-      };
-      return map[track] || 'border-slate-700 bg-slate-800 text-slate-300';
-    }
+      // Milestones Grid
+      const paidTotal = state.milestones.filter(m => m.paid).reduce((acc, m) => acc + m.amount, 0);
+      document.getElementById('milestone-paid-summary').textContent = `Cleared: ₹${paidTotal.toLocaleString('en-IN')} / ₹3,80,000`;
 
-    function statusSelectClass(status) {
-      if (status === 'Completed') return 'border-emerald-400/45 bg-emerald-500/15 text-emerald-300';
-      if (status === 'In Progress') return 'border-sky-400/45 bg-sky-500/15 text-sky-300';
-      if (status === 'Testing') return 'border-indigo-400/45 bg-indigo-500/15 text-indigo-300';
-      return 'border-slate-700 bg-obsidian text-slate-300';
-    }
-
-    function selectPhase(val) {
-      selectedPhase = val;
-      renderRoadmapPage();
-    }
-
-    function selectTrack(tr) {
-      selectedTrack = tr;
-      renderRoadmapPage();
-    }
-
-    function updateTaskField(id, field, value) {
-      const task = state.tasks.find(t => t.id === id);
-      if (task) {
-        task[field] = value;
-        saveState(`Task #${id} updated`);
-        renderRoadmapPage();
-      }
-    }
-
-    function toggleTaskDone(id) {
-      const task = state.tasks.find(t => t.id === id);
-      if (task) {
-        task.status = task.status === 'Completed' ? 'Pending' : 'Completed';
-        saveState(`Task #${id}: ${task.status}`);
-        renderRoadmapPage();
-      }
-    }
-
-    // ==========================================
-    // RENDER PAGE 3: TECH STACK & OPS
-    // ==========================================
-    function renderOpsPage() {
-      const readyCount = state.stack.filter(s => s.ready).length;
-      document.getElementById('ops-stack-count').textContent = `${readyCount} / ${state.stack.length}`;
-
-      document.getElementById('stack-list').innerHTML = state.stack.map(item => `
-        <button
-          onclick="toggleStack('${item.id}')"
-          class="flex w-full items-center justify-between gap-3 rounded-xl border p-3 text-left transition ${
-            item.ready
-              ? 'border-emerald-400/40 bg-emerald-950/20'
-              : 'border-slate-800 bg-obsidian/80 hover:border-slate-600'
-          }"
-        >
+      document.getElementById('milestones-grid').innerHTML = state.milestones.map(m => `
+        <div class="glass-card rounded-2xl p-4 flex items-start justify-between gap-4 ${m.paid ? 'border-emerald-500/40' : ''}">
           <div>
-            <p class="text-xs font-bold text-white">${item.name}</p>
-            <p class="text-[11px] text-slate-400">${item.detail}</p>
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-cyan-300">${m.week}</span>
+              <h3 class="text-sm font-bold text-white">${m.name}</h3>
+            </div>
+            <p class="text-xs text-slate-400 mt-1.5">${m.deliverable}</p>
+            <div class="text-base font-mono font-bold text-emerald-400 mt-2">₹${m.amount.toLocaleString('en-IN')}</div>
           </div>
-          <span class="shrink-0 rounded-md border px-2 py-0.5 font-mono text-[10px] font-bold ${
-            item.ready
-              ? 'border-emerald-400/45 bg-emerald-400/15 text-emerald-300'
-              : 'border-slate-700 bg-slate-800/80 text-slate-400'
+          <button onclick="toggleMilestone('${m.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition flex-shrink-0 ${
+            m.paid
+              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+              : 'bg-slate-900 text-slate-400 hover:text-white border-slate-700'
           }">
-            ${item.ready ? 'READY' : 'PENDING'}
-          </span>
-        </button>
-      `).join('');
-
-      const activeGuards = state.guardrails.filter(g => g.active).length;
-      document.getElementById('ops-guard-count').textContent = `${activeGuards} / ${state.guardrails.length}`;
-
-      document.getElementById('guardrails-list').innerHTML = state.guardrails.map(g => `
-        <button
-          onclick="toggleGuardrail('${g.id}')"
-          class="flex w-full items-center justify-between gap-3 rounded-xl border p-3 text-left transition ${
-            g.active
-              ? 'border-sky-400/40 bg-sky-950/20'
-              : 'border-slate-800 bg-obsidian/80 hover:border-slate-600'
-          }"
-        >
-          <div>
-            <p class="text-xs font-bold text-white">${g.title}</p>
-            <p class="text-[11px] text-slate-400">${g.detail}</p>
-          </div>
-          <span class="shrink-0 rounded-md border px-2 py-0.5 font-mono text-[10px] font-bold ${
-            g.active
-              ? 'border-sky-400/45 bg-sky-400/15 text-sky-300'
-              : 'border-slate-700 bg-slate-800/80 text-slate-400'
-          }">
-            ${g.active ? 'ACTIVE' : 'OPEN'}
-          </span>
-        </button>
+            ${m.paid ? '✓ Cleared' : 'Mark Cleared'}
+          </button>
+        </div>
       `).join('');
     }
 
-    function toggleStack(id) {
-      const item = state.stack.find(s => s.id === id);
-      if (item) {
-        item.ready = !item.ready;
-        saveState(`${item.name}: ${item.ready ? 'Ready' : 'Pending'}`);
-        renderOpsPage();
-      }
-    }
-
-    function toggleGuardrail(id) {
-      const item = state.guardrails.find(g => g.id === id);
-      if (item) {
-        item.active = !item.active;
-        saveState(`${item.title}: ${item.active ? 'Active' : 'Open'}`);
-        renderOpsPage();
-      }
-    }
-
-    // ==========================================
-    // RENDER PAGE 4: SOURCE CODE
-    // ==========================================
-    function renderSourcePage() {
-      const code = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-      document.getElementById('source-viewer').value = code;
-    }
-
-    function copyHtmlCode() {
-      const box = document.getElementById('source-viewer');
-      if (!box.value) renderSourcePage();
-      box.select();
-      box.setSelectionRange(0, 999999);
-      document.execCommand('copy');
-      showToast('HTML code copied to clipboard');
-    }
-
-    function downloadHtmlFile() {
-      const code = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-      triggerDownload(code, 'uber_dev_tracker.html', 'text/html;charset=utf-8');
-      showToast('Downloaded uber_dev_tracker.html');
-    }
-
-    // ==========================================
-    // EXPORTS (.TXT & .DOC)
-    // ==========================================
-    function exportTxtReport() {
-      const total = state.tasks.length;
+    // Export TXT Report
+    function exportTXT() {
       const done = state.tasks.filter(t => t.status === 'Completed').length;
-      const pct = total === 0 ? 0 : Math.round((done / total) * 100);
-
-      const out = [
-        'UBER-CLONE DEVELOPER COMMAND CENTER — PROGRESS REPORT',
+      const pct = Math.round((done / state.tasks.length) * 100);
+      let lines = [
+        '====================================================================',
+        '@INGINE TECH — TAXI APP DEVELOPMENT & LAUNCH PROGRESS REPORT',
+        '====================================================================',
         `Generated: ${new Date().toLocaleString()}`,
-        `Overall Completion: ${pct}% (${done}/${total} tasks completed)`,
-        '====================================================================\n',
-        'TECH STACK READINESS:',
-        ...state.stack.map(s => `[${s.ready ? 'READY  ' : 'PENDING'}] ${s.name} — ${s.detail}`),
-        '\nWEEKLY MANAGEMENT GUARDRAILS:',
-        ...state.guardrails.map(g => `[${g.active ? 'ACTIVE' : 'OPEN  '}] ${g.title} — ${g.detail}`),
-        '\n6-PHASE ENGINEERING ROADMAP:'
+        `Overall Progress: ${pct}% (${done}/${state.tasks.length} Deliverables Completed)`,
+        `Total Quote: ₹3,80,000 | Delivery: 8 Weeks | Model: Fixed Daily Driver Fee`,
+        '',
+        '--- PAYMENT MILESTONES ---'
       ];
-
-      PHASES.forEach(p => {
-        const pTasks = state.tasks.filter(t => t.phase === p.id);
-        out.push(`\n--- ${p.short.toUpperCase()}: ${p.title} (${p.weeks}) ---`);
-        pTasks.forEach(t => {
-          out.push(`[${t.status.toUpperCase().padEnd(11)}] #${t.id} [${t.track}] ${t.title}`);
-          out.push(`              Assignee: ${t.assignee || 'Unassigned'} | Due: ${t.dueDate || 'TBD'}`);
-          out.push(`              Scope: ${t.summary}`);
+      state.milestones.forEach(m => {
+        lines.push(`[${m.paid ? 'CLEARED' : 'PENDING'}] ${m.name} (${m.week}) - ₹${m.amount.toLocaleString('en-IN')} | ${m.deliverable}`);
+      });
+      lines.push('', '--- 5-PHASE EXECUTION ROADMAP ---');
+      state.phases.forEach(p => {
+        lines.push(`\n${p.short}: ${p.title} (${p.weeks}) — ${p.milestone}`);
+        state.tasks.filter(t => t.phase === p.id).forEach(t => {
+          lines.push(`  • [${t.status.toUpperCase()}] ${t.title} (${t.track} | ${t.cost}) | Dev: ${t.assignee || 'Unassigned'} | Due: ${t.due}`);
         });
       });
 
-      triggerDownload(out.join('\n'), `Uber-Clone-Roadmap-${new Date().toISOString().slice(0, 10)}.txt`, 'text/plain;charset=utf-8');
+      const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+      triggerDownload(blob, 'ingine_tech_taxi_tracker_report.txt');
       showToast('Exported .TXT report');
     }
 
-    function exportWordReport() {
-      const total = state.tasks.length;
+    // Export Word (.DOC) Report
+    function exportDOC() {
       const done = state.tasks.filter(t => t.status === 'Completed').length;
-      const pct = total === 0 ? 0 : Math.round((done / total) * 100);
-
-      const htmlDoc = `
+      const pct = Math.round((done / state.tasks.length) * 100);
+      const html = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-        <head><meta charset="utf-8"><title>Uber-Clone Roadmap Report</title>
-        <style>
-          body { font-family: Calibri, Arial, sans-serif; color: #1e293b; }
-          h1 { color: #0f172a; border-bottom: 2px solid #0284c7; padding-bottom: 6px; }
-          h2 { color: #0369a1; margin-top: 20px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 10pt; }
-          th { background: #0f172a; color: #fff; text-align: left; padding: 7px; border: 1px solid #334155; }
-          td { padding: 6px 7px; border: 1px solid #cbd5e1; }
-        </style></head>
-        <body>
-          <h1>Uber-Clone Developer Command Center — Progress Report</h1>
-          <p><strong>Generated:</strong> ${esc(new Date().toLocaleString())} &nbsp;|&nbsp; <strong>Completion:</strong> ${pct}% (${done}/${total} tasks)</p>
-          <h2>6-Phase Engineering Roadmap</h2>
-          <table>
-            <tr><th>ID</th><th>Phase</th><th>Track</th><th>Task &amp; Deliverable</th><th>Assignee</th><th>Due Date</th><th>Status</th></tr>
-            ${state.tasks.map(t => `
-              <tr>
-                <td>#${esc(t.id)}</td>
-                <td>Phase ${t.phase}</td>
-                <td>${esc(t.track)}</td>
-                <td><strong>${esc(t.title)}</strong><br/>${esc(t.summary)}</td>
-                <td>${esc(t.assignee || 'Unassigned')}</td>
-                <td>${esc(t.dueDate || '—')}</td>
-                <td><strong>${esc(t.status)}</strong></td>
-              </tr>
-            `).join('')}
+        <head><meta charset='utf-8'><title>@ingine tech Taxi App Report</title></head>
+        <body style="font-family: Arial, sans-serif; color: #1e293b;">
+          <h2 style="color:#0f172a;">@ingine tech — Taxi App Development & Go-Live Report</h2>
+          <p><strong>Overall Progress:</strong> ${pct}% (${done}/${state.tasks.length} tasks) | <strong>All-Inclusive Quote:</strong> ₹3,80,000 | <strong>Timeline:</strong> 8 Weeks</p>
+          <h3>Payment Milestones</h3>
+          <table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse; width:100%; font-size:12px;">
+            <tr style="background:#f1f5f9;"><th>Milestone</th><th>Timeline</th><th>Deliverable</th><th>Amount</th><th>Status</th></tr>
+            ${state.milestones.map(m => `<tr><td>${m.name}</td><td>${m.week}</td><td>${m.deliverable}</td><td>₹${m.amount.toLocaleString('en-IN')}</td><td>${m.paid ? 'Cleared' : 'Pending'}</td></tr>`).join('')}
           </table>
-          <h2>Tech Stack Readiness</h2>
-          <table>
-            <tr><th>Module</th><th>Specification</th><th>Status</th></tr>
-            ${state.stack.map(s => `<tr><td><strong>${esc(s.name)}</strong></td><td>${esc(s.detail)}</td><td>${s.ready ? 'READY' : 'PENDING'}</td></tr>`).join('')}
+          <h3>8-Week Execution Tasks</h3>
+          <table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse; width:100%; font-size:12px;">
+            <tr style="background:#f1f5f9;"><th>Phase</th><th>Track</th><th>Deliverable</th><th>Budget</th><th>Developer</th><th>Target</th><th>Status</th></tr>
+            ${state.tasks.map(t => `<tr><td>${t.phase}</td><td>${t.track}</td><td><strong>${t.title}</strong><br/>${t.desc}</td><td>${t.cost}</td><td>${t.assignee || 'Unassigned'}</td><td>${t.due}</td><td>${t.status}</td></tr>`).join('')}
           </table>
         </body></html>
       `;
-
-      triggerDownload('\ufeff' + htmlDoc, `Uber-Clone-Roadmap-${new Date().toISOString().slice(0, 10)}.doc`, 'application/msword');
-      showToast('Exported Word .DOC report');
+      const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+      triggerDownload(blob, 'ingine_tech_taxi_tracker_report.doc');
+      showToast('Exported Word (.DOC) report');
     }
 
-    function triggerDownload(content, filename, mime) {
-      const blob = new Blob([content], { type: mime });
+    function downloadHTML() {
+      const fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+      triggerDownload(blob, 'ingine_taxi_tracker.html');
+      showToast('Downloaded ingine_taxi_tracker.html');
+    }
+
+    function copySourceCode() {
+      const fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      navigator.clipboard.writeText(fullHtml).then(() => {
+        showToast('HTML code copied to clipboard');
+      });
+    }
+
+    function triggerDownload(blob, filename) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -1020,72 +735,8 @@
       URL.revokeObjectURL(url);
     }
 
-    // ==========================================
-    // MODALS (ADD TASK & RESET)
-    // ==========================================
-    function openAddModal() {
-      if (typeof selectedPhase === 'number') {
-        document.getElementById('in-phase').value = String(selectedPhase);
-      }
-      document.getElementById('add-modal').classList.remove('hidden');
-      document.getElementById('add-modal').classList.add('flex');
-    }
-
-    function openResetModal() {
-      document.getElementById('reset-modal').classList.remove('hidden');
-      document.getElementById('reset-modal').classList.add('flex');
-    }
-
-    function closeModal(id) {
-      const el = document.getElementById(id);
-      el.classList.add('hidden');
-      el.classList.remove('flex');
-    }
-
-    function createNewTask(e) {
-      e.preventDefault();
-      const phase = parseInt(document.getElementById('in-phase').value, 10);
-      const track = document.getElementById('in-track').value;
-      const title = document.getElementById('in-title').value.trim();
-      const summary = document.getElementById('in-summary').value.trim();
-      const assignee = document.getElementById('in-assignee').value.trim();
-      const dueDate = document.getElementById('in-date').value;
-
-      const nextNum = state.tasks.filter(t => t.phase === phase).length + 1;
-      const newId = `${phase}.${nextNum}`;
-
-      state.tasks.push({
-        id: newId,
-        phase,
-        track,
-        title,
-        summary,
-        assignee,
-        dueDate,
-        status: 'Pending'
-      });
-
-      selectedPhase = phase;
-      saveState(`Added Task #${newId}`);
-      e.target.reset();
-      closeModal('add-modal');
-      renderRoadmapPage();
-    }
-
-    function confirmReset() {
-      localStorage.removeItem(STORAGE_KEY);
-      state = {
-        tasks: JSON.parse(JSON.stringify(INITIAL_TASKS)),
-        stack: JSON.parse(JSON.stringify(INITIAL_STACK)),
-        guardrails: JSON.parse(JSON.stringify(INITIAL_GUARDRAILS))
-      };
-      saveState('All progress reset');
-      closeModal('reset-modal');
-      switchPage(currentPage);
-    }
-
-    // Initialize App
-    switchPage('overview');
+    // Initialize
+    renderAll();
   </script>
 </body>
 </html>
